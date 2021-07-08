@@ -5,13 +5,19 @@ namespace Service.Liquidity.PortfolioHedger.Settings
 {
     public class SettingsModel
     {
-        [YamlProperty("Liquidity.PortfolioHedger.SeqServiceUrl")]
+        [YamlProperty("LiquidityPortfolioHedger.SeqServiceUrl")]
         public string SeqServiceUrl { get; set; }
 
-        [YamlProperty("Liquidity.PortfolioHedger.ZipkinUrl")]
+        [YamlProperty("LiquidityPortfolioHedger.ZipkinUrl")]
         public string ZipkinUrl { get; set; }
 
-        [YamlProperty("Liquidity.PortfolioHedger.ElkLogs")]
+        [YamlProperty("LiquidityPortfolioHedger.ElkLogs")]
         public LogElkSettings ElkLogs { get; set; }
+
+        [YamlProperty("LiquidityPortfolioHedger.SpotServiceBusHostPort")]
+        public string SpotServiceBusHostPort { get; set; }
+
+        [YamlProperty("LiquidityPortfolioHedger.ServiceBusQuerySuffix")]
+        public string ServiceBusQuerySuffix { get; set; }
     }
 }
