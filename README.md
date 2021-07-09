@@ -6,5 +6,5 @@
 
 ![CI test build](https://github.com/MyJetWallet/Service.Liquidity.PortfolioHedger/workflows/CI%20test%20build/badge.svg)
 
-*Client library:* ![Nuget version](https://img.shields.io/nuget/v/MyJetWallet.Service.Liquidity.PortfolioHedger.Client?label=MyJetWallet.Service.Liquidity.PortfolioHedger.Client&style=social)
+*Client library:* ![Nuget version](https://img.shields.io/nuget/v/MyJetWallet.Service.Liquidity.PortfolioHedger.Client?label=MyJetWallet.Service.Liquidity.PortfolioHedger.Client&style=social) 
 
