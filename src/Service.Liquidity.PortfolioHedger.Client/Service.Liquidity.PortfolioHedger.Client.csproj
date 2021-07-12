@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference PrivateAssets="All" Include="..\Service.Liquidity.PortfolioHedger.Domain.Models\Service.Liquidity.PortfolioHedger.Domain.Models.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\Service.Liquidity.PortfolioHedger.Grpc\Service.Liquidity.PortfolioHedger.Grpc.csproj" />
-    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
+    <ProjectReference PrivateAssets="All" Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
