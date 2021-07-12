@@ -52,10 +52,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             marketTrade.ExchangeName = request.ExchangeName;
             marketTrade.Volume = request.BaseVolume;
             marketTrade.Side = request.BaseVolume > 0 ? OrderSide.Buy : OrderSide.Sell;
-            
-            // todo: check
             marketTrade.Market = request.InstrumentSymbol;
-            marketTrade.ReferenceId = Guid.NewGuid().ToString("N");
 
             return marketTrade;
         }
