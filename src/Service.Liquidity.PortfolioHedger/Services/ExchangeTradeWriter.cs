@@ -6,8 +6,6 @@ namespace Service.Liquidity.PortfolioHedger.Services
 {
     public class ExchangeTradeWriter
     {
-        public const string TopicName = "trade-hedger";
-
         private readonly IPublisher<ExchangeTrade> _publisher;
 
         public ExchangeTradeWriter(IPublisher<ExchangeTrade> publisher)

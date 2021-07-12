@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference PrivateAssets="All" Include="..\Service.Liquidity.PortfolioHedger.Domain.Models\Service.Liquidity.PortfolioHedger.Domain.Models.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\Service.Liquidity.PortfolioHedger.Grpc\Service.Liquidity.PortfolioHedger.Grpc.csproj" />
+    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <PackageReference Include="Grpc.Net.Client" Version="2.38.0" />
     <PackageReference Include="MyJetWallet.Sdk.Grpc" Version="1.0.2" />
     <PackageReference Include="MyJetWallet.Sdk.GrpcMetrics" Version="2.0.0" />
+    <PackageReference Include="MyServiceBus.TcpClient" Version="2.4.4" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
     <PackageReference Include="protobuf-net.Grpc" Version="1.0.152" />
   </ItemGroup>

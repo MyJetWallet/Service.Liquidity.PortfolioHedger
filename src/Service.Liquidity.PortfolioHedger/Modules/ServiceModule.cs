@@ -5,6 +5,7 @@ using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using Service.Liquidity.Portfolio.Client;
 using Service.Liquidity.PortfolioHedger.Job;
+using Service.Liquidity.PortfolioHedger.ServiceBus;
 using Service.Liquidity.PortfolioHedger.Services;
 
 namespace Service.Liquidity.PortfolioHedger.Modules
@@ -18,7 +19,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder.RegisterAssetBalanceServiceBusClient(serviceBusClient, $"LiquidityPortfolioHedger-{Program.Settings.ServiceBusQuerySuffix}",
                 TopicQueueType.PermanentWithSingleConnection, true);
             
-            builder.RegisterMyServiceBusPublisher<ExchangeTrade>(serviceBusClient, ExchangeTradeWriter.TopicName, true);
+            builder.RegisterMyServiceBusPublisher<ExchangeTrade>(serviceBusClient, PortfolioHedgerServiceBusSubscriber.TopicName, true);
             
             builder
                 .RegisterType<AssetBalanceStateHandler>()

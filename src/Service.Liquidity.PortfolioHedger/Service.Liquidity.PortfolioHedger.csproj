@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.Domain\Service.Liquidity.PortfolioHedger.Domain.csproj" />
     <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.Grpc\Service.Liquidity.PortfolioHedger.Grpc.csproj" />
+    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
