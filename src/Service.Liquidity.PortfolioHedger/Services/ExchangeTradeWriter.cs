@@ -1,19 +1,19 @@
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
-using MyJetWallet.Domain.ExternalMarketApi.Models;
+using Service.Liquidity.PortfolioHedger.ServiceBus;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {
     public class ExchangeTradeWriter
     {
-        private readonly IPublisher<ExchangeTrade> _publisher;
+        private readonly IPublisher<ExchangeTradeMessage> _publisher;
 
-        public ExchangeTradeWriter(IPublisher<ExchangeTrade> publisher)
+        public ExchangeTradeWriter(IPublisher<ExchangeTradeMessage> publisher)
         {
             _publisher = publisher;
         }
         
-        public async Task PublishTrade(ExchangeTrade trade)
+        public async Task PublishTrade(ExchangeTradeMessage trade)
         {
             await _publisher.PublishAsync(trade);
         }

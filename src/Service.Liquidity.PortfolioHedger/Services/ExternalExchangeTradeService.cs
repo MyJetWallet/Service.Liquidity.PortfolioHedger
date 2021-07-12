@@ -8,6 +8,7 @@ using MyJetWallet.Domain.Orders;
 using Newtonsoft.Json;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
+using Service.Liquidity.PortfolioHedger.ServiceBus;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {
@@ -36,11 +37,28 @@ namespace Service.Liquidity.PortfolioHedger.Services
                 var tradeForExchange = GetTradeForExchange(request);
                 _logger.LogInformation("tradeForExchange: {tradeForExchangeJson}", JsonConvert.SerializeObject(tradeForExchange));
                 
-                var trade = await _externalMarket.MarketTrade(tradeForExchange);
-                
-                _logger.LogInformation("Trade from externalMarket: {tradeJson}", JsonConvert.SerializeObject(trade));
-                
-                await _exchangeTradeWriter.PublishTrade(trade);
+                var marketTrade = await _externalMarket.MarketTrade(tradeForExchange);
+                _logger.LogInformation("Trade from externalMarket: {tradeJson}", JsonConvert.SerializeObject(marketTrade));
+
+                var exchangeTradeMessage = new ExchangeTradeMessage()
+                {
+                    AssociateBrokerId = request.AssociateBrokerId,
+                    BaseAsset = request.BaseAsset,
+                    QuoteAsset = request.QuoteAsset,
+                    AssociateClientId = marketTrade.AssociateClientId,
+                    AssociateSymbol = marketTrade.Market,
+                    AssociateWalletId = request.ExchangeName,
+                    Id = marketTrade.Id,
+                    Market = marketTrade.Market,
+                    Volume = marketTrade.Volume,
+                    Timestamp = marketTrade.Timestamp,
+                    OppositeVolume = marketTrade.OppositeVolume,
+                    Price = marketTrade.Price,
+                    ReferenceId = marketTrade.ReferenceId,
+                    Side = marketTrade.Side,
+                    Source = marketTrade.Source
+                };
+                await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
             }
             catch (Exception exception)
             {
@@ -64,7 +82,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             marketTrade.ExchangeName = request.ExchangeName;
             marketTrade.Volume = request.BaseVolume;
             marketTrade.Side = request.BaseVolume > 0 ? OrderSide.Buy : OrderSide.Sell;
-            marketTrade.Market = request.InstrumentSymbol;
+            marketTrade.Market = request.Market;
 
             return marketTrade;
         }

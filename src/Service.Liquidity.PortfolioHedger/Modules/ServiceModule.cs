@@ -19,7 +19,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder.RegisterAssetBalanceServiceBusClient(serviceBusClient, $"LiquidityPortfolioHedger-{Program.Settings.ServiceBusQuerySuffix}",
                 TopicQueueType.PermanentWithSingleConnection, true);
             
-            builder.RegisterMyServiceBusPublisher<ExchangeTrade>(serviceBusClient, PortfolioHedgerServiceBusSubscriber.TopicName, true);
+            builder.RegisterMyServiceBusPublisher<ExchangeTradeMessage>(serviceBusClient, ExchangeTradeMessage.TopicName, true);
             
             builder
                 .RegisterType<AssetBalanceStateHandler>()

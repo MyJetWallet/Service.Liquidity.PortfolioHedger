@@ -9,13 +9,11 @@ using MyServiceBus.TcpClient;
 namespace Service.Liquidity.PortfolioHedger.ServiceBus
 {
     [UsedImplicitly]
-    public class PortfolioHedgerServiceBusSubscriber : Subscriber<ExchangeTrade>
+    public class PortfolioHedgerServiceBusSubscriber : Subscriber<ExchangeTradeMessage>
     {
-        public const string TopicName = "trade-hedger";
-        
         public PortfolioHedgerServiceBusSubscriber(MyServiceBusTcpClient client, string queueName, TopicQueueType queryType, bool batchSubscriber) :
-            base(client, TopicName, queueName, queryType,
-                bytes => bytes.ByteArrayToServiceBusContract<ExchangeTrade>(), batchSubscriber)
+            base(client, ExchangeTradeMessage.TopicName, queueName, queryType,
+                bytes => bytes.ByteArrayToServiceBusContract<ExchangeTradeMessage>(), batchSubscriber)
         {
         }
     }

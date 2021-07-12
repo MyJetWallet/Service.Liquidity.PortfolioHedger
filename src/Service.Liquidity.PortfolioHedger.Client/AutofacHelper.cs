@@ -28,14 +28,14 @@ namespace Service.Liquidity.PortfolioHedger.Client
             {
                 builder
                     .RegisterInstance(new PortfolioHedgerServiceBusSubscriber(client, queueName, queryType, true))
-                    .As<ISubscriber<IReadOnlyList<ExchangeTrade>>>()
+                    .As<ISubscriber<IReadOnlyList<ExchangeTradeMessage>>>()
                     .SingleInstance();
             }
             else
             {
                 builder
                     .RegisterInstance(new PortfolioHedgerServiceBusSubscriber(client, queueName, queryType, false))
-                    .As<ISubscriber<ExchangeTrade>>()
+                    .As<ISubscriber<ExchangeTradeMessage>>()
                     .SingleInstance();
             }
         }
