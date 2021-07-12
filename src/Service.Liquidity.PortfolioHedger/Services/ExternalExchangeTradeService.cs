@@ -12,19 +12,22 @@ namespace Service.Liquidity.PortfolioHedger.Services
     {
         private readonly IExternalExchangeManager _externalExchangeManager;
         private readonly IExternalMarket _externalMarket;
+        private readonly ExchangeTradeWriter _exchangeTradeWriter;
 
         public ExternalExchangeTradeService(IExternalExchangeManager externalExchangeManager,
-            IExternalMarket externalMarket)
+            IExternalMarket externalMarket, ExchangeTradeWriter exchangeTradeWriter)
         {
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
+            _exchangeTradeWriter = exchangeTradeWriter;
         }
 
         public async Task<CreateManualTradeResponse> CreateManualTradeAsync(MarketTradeRequest request)
         {
             try
             {
-                await _externalMarket.MarketTrade(request);
+                var trade = await _externalMarket.MarketTrade(request);
+                await _exchangeTradeWriter.PublishTrade(trade);
             }
             catch (Exception exception)
             {
