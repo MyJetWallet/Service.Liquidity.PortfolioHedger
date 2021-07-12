@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
+using MyJetWallet.Domain.Orders;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
@@ -22,11 +23,13 @@ namespace Service.Liquidity.PortfolioHedger.Services
             _exchangeTradeWriter = exchangeTradeWriter;
         }
 
-        public async Task<CreateManualTradeResponse> CreateManualTradeAsync(MarketTradeRequest request)
+        public async Task<CreateManualTradeResponse> CreateManualTradeAsync(CreateManualTradeRequest request)
         {
             try
             {
-                var trade = await _externalMarket.MarketTrade(request);
+                var tradeForExchange = GetTradeForExchange(request);
+                
+                var trade = await _externalMarket.MarketTrade(tradeForExchange);
                 await _exchangeTradeWriter.PublishTrade(trade);
             }
             catch (Exception exception)
@@ -41,6 +44,20 @@ namespace Service.Liquidity.PortfolioHedger.Services
             {
                 Success = true
             };
+        }
+
+        private MarketTradeRequest GetTradeForExchange(CreateManualTradeRequest request)
+        {
+            var marketTrade = new MarketTradeRequest();
+            marketTrade.ExchangeName = request.ExchangeName;
+            marketTrade.Volume = request.BaseVolume;
+            marketTrade.Side = request.BaseVolume > 0 ? OrderSide.Buy : OrderSide.Sell;
+            
+            // todo: check
+            marketTrade.Market = request.InstrumentSymbol;
+            marketTrade.ReferenceId = Guid.NewGuid().ToString("N");
+
+            return marketTrade;
         }
 
         public async Task<GetExternalExchangeCollectionResponse> GetExternalExchangeCollectionAsync()

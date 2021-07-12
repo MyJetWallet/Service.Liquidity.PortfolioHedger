@@ -15,7 +15,6 @@ namespace Service.Liquidity.PortfolioHedger.Services
             _publisher = publisher;
         }
         
-
         public async Task PublishTrade(ExchangeTrade trade)
         {
             await _publisher.PublishAsync(trade);
