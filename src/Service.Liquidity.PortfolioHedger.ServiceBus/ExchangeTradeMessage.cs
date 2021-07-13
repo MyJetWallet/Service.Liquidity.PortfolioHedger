@@ -51,5 +51,9 @@ namespace Service.Liquidity.PortfolioHedger.ServiceBus
         public string BaseAsset { get; set; }
         [DataMember(Order = 15)]
         public string QuoteAsset { get; set; }
+        [DataMember(Order = 16)]
+        public string Comment { get; set; }
+        [DataMember(Order = 17)]
+        public string User { get; set; }
     }
 }

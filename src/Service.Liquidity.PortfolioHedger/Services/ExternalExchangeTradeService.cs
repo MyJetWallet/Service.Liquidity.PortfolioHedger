@@ -56,7 +56,9 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     Price = marketTrade.Price,
                     ReferenceId = marketTrade.ReferenceId,
                     Side = marketTrade.Side,
-                    Source = marketTrade.Source
+                    Source = marketTrade.Source,
+                    Comment = request.Comment,
+                    User = request.User
                 };
                 await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
             }
