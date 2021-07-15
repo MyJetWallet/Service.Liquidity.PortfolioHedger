@@ -19,5 +19,8 @@ namespace Service.Liquidity.PortfolioHedger.Settings
 
         [YamlProperty("LiquidityPortfolioHedger.ServiceBusQuerySuffix")]
         public string ServiceBusQuerySuffix { get; set; }
+
+        [YamlProperty("LiquidityPortfolioHedger.ExternalApiGrpcUrl")]
+        public string ExternalApiGrpcUrl { get; set; }
     }
 }
