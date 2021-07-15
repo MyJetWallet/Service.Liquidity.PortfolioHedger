@@ -9,7 +9,10 @@ namespace Service.Liquidity.PortfolioHedger.Grpc
     public interface IExternalExchangeTradeService
     {
         [OperationContract]
-        Task<CreateManualTradeResponse> CreateManualTradeAsync(CreateManualTradeRequest request);
+        Task<ManualTradeResponse> CreateManualTradeAsync(CreateManualTradeRequest request);
+        
+        [OperationContract]
+        Task<ManualTradeResponse> ReportManualTradeAsync(ReportManualTradeRequest request);
 
         [OperationContract]
         Task<GetExternalExchangeCollectionResponse> GetExternalExchangeCollectionAsync();

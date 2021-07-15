@@ -6,14 +6,14 @@ namespace Service.Liquidity.PortfolioHedger.Services
 {
     public class ExchangeTradeWriter
     {
-        private readonly IPublisher<ExchangeTradeMessage> _publisher;
+        private readonly IPublisher<TradeMessage> _publisher;
 
-        public ExchangeTradeWriter(IPublisher<ExchangeTradeMessage> publisher)
+        public ExchangeTradeWriter(IPublisher<TradeMessage> publisher)
         {
             _publisher = publisher;
         }
         
-        public async Task PublishTrade(ExchangeTradeMessage trade)
+        public async Task PublishTrade(TradeMessage trade)
         {
             await _publisher.PublishAsync(trade);
         }

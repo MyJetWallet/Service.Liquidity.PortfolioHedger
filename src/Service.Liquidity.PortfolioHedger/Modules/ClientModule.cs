@@ -1,5 +1,7 @@
 using Autofac;
 using MyJetWallet.Domain.ExternalMarketApi;
+using MyJetWallet.Sdk.NoSql;
+using Service.AssetsDictionary.Client;
 
 namespace Service.Liquidity.PortfolioHedger.Modules
 {
@@ -7,6 +9,9 @@ namespace Service.Liquidity.PortfolioHedger.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
+            var myNoSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
+            builder.RegisterAssetsDictionaryClients(myNoSqlClient);
+            
             builder.RegisterExternalMarketClient(Program.Settings.ExternalApiGrpcUrl);
         }
     }

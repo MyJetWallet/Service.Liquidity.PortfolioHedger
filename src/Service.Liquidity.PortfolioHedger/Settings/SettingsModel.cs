@@ -22,5 +22,8 @@ namespace Service.Liquidity.PortfolioHedger.Settings
 
         [YamlProperty("LiquidityPortfolioHedger.ExternalApiGrpcUrl")]
         public string ExternalApiGrpcUrl { get; set; }
+
+        [YamlProperty("LiquidityPortfolioHedger.MyNoSqlReaderHostPort")]
+        public string MyNoSqlReaderHostPort { get; set; }
     }
 }

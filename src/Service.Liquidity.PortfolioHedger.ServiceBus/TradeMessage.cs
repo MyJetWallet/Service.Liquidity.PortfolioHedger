@@ -5,7 +5,7 @@ using MyJetWallet.Domain.Orders;
 namespace Service.Liquidity.PortfolioHedger.ServiceBus
 {
     [DataContract]
-    public class ExchangeTradeMessage
+    public class TradeMessage
     {
         public const string TopicName = "trade-hedger";
         
