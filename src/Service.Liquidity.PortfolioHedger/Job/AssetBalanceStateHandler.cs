@@ -1,31 +1,50 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Autofac;
-using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
-using Service.Liquidity.Portfolio.Grpc.Models.GetBalances;
+using MyNoSqlServer.Abstractions;
+using Service.Liquidity.Monitoring.Domain.Models;
+using Service.Liquidity.Portfolio.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Job
 {
-    public class AssetBalanceStateHandler : IStartable
+    public class AssetBalanceStateHandler
     {
         private readonly ILogger<AssetBalanceStateHandler> _logger;
+        private readonly IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> _assetPortfolioBalanceDataReader;
+        private readonly IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> _assetPortfolioStatusDataReader;
         
-        public AssetBalanceStateHandler(ISubscriber<IReadOnlyList<NetBalanceByAsset>> subscriber,
-            ILogger<AssetBalanceStateHandler> logger)
+        public AssetBalanceStateHandler(ILogger<AssetBalanceStateHandler> logger,
+            IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> assetPortfolioBalanceDataReader,
+            IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> assetPortfolioStatusDataReader)
         {
             _logger = logger;
-            subscriber.Subscribe(HandleBalances);
-        }
-
-        private ValueTask HandleBalances(IReadOnlyList<NetBalanceByAsset> balances)
-        {
-            _logger.LogInformation($"AssetBalanceStateHandler receive message {balances}");
-            return default;
+            _assetPortfolioBalanceDataReader = assetPortfolioBalanceDataReader;
+            _assetPortfolioStatusDataReader = assetPortfolioStatusDataReader;
         }
 
         public void Start()
         {
+            _assetPortfolioBalanceDataReader.SubscribeToUpdateEvents(HandleUpdateBalance, HandleDeleteBalance);
+            _assetPortfolioStatusDataReader.SubscribeToUpdateEvents(HandleUpdateStatus, HandleDeleteStatus);
+
+            var t = _assetPortfolioBalanceDataReader.Get();
+            var n = _assetPortfolioStatusDataReader.Get();
+        }
+
+        private void HandleDeleteStatus(IReadOnlyList<AssetPortfolioStatusNoSql> statuses)
+        {
+        }
+
+        private void HandleUpdateStatus(IReadOnlyList<AssetPortfolioStatusNoSql> statuses)
+        {
+        }
+
+        private void HandleDeleteBalance(IReadOnlyList<AssetPortfolioBalanceNoSql> balances)
+        {
+        }
+
+        private void HandleUpdateBalance(IReadOnlyList<AssetPortfolioBalanceNoSql> balances)
+        {
+            _logger.LogInformation($"AssetBalanceStateHandler receive message {balances}");
         }
     }
 }

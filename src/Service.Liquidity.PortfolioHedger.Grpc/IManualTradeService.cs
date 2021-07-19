@@ -6,7 +6,7 @@ using Service.Liquidity.PortfolioHedger.Grpc.Models;
 namespace Service.Liquidity.PortfolioHedger.Grpc
 {
     [ServiceContract]
-    public interface IExternalExchangeTradeService
+    public interface IManualTradeService
     {
         [OperationContract]
         Task<ManualTradeResponse> CreateManualTradeAsync(CreateManualTradeRequest request);

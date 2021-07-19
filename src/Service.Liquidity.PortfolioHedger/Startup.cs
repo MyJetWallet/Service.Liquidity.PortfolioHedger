@@ -50,7 +50,7 @@ namespace Service.Liquidity.PortfolioHedger
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcSchema<ExternalExchangeTradeService, IExternalExchangeTradeService>();
+                endpoints.MapGrpcSchema<ManualTradeService, IManualTradeService>();
                 endpoints.MapGrpcSchemaRegistry();
 
                 endpoints.MapGet("/", async context =>

@@ -10,6 +10,6 @@ namespace Service.Liquidity.PortfolioHedger.Client
         public PortfolioHedgerClientFactory(string grpcServiceUrl) : base(grpcServiceUrl)
         {
         }
-        public IExternalExchangeTradeService GetExternalExchangeTradeService() => CreateGrpcService<IExternalExchangeTradeService>();
+        public IManualTradeService GetExternalExchangeTradeService() => CreateGrpcService<IManualTradeService>();
     }
 }

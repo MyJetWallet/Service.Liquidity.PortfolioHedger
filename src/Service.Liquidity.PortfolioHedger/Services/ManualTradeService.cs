@@ -16,17 +16,17 @@ using Service.Liquidity.PortfolioHedger.ServiceBus;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {
-    public class ExternalExchangeTradeService : IExternalExchangeTradeService
+    public class ManualTradeService : IManualTradeService
     {
         private readonly IExternalExchangeManager _externalExchangeManager;
         private readonly IExternalMarket _externalMarket;
         private readonly ExchangeTradeWriter _exchangeTradeWriter;
-        private readonly ILogger<ExternalExchangeTradeService> _logger;
+        private readonly ILogger<ManualTradeService> _logger;
         private readonly ISpotInstrumentDictionaryClient _spotInstrumentDictionaryClient;
 
-        public ExternalExchangeTradeService(IExternalExchangeManager externalExchangeManager,
+        public ManualTradeService(IExternalExchangeManager externalExchangeManager,
             IExternalMarket externalMarket, ExchangeTradeWriter exchangeTradeWriter,
-            ILogger<ExternalExchangeTradeService> logger, ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient)
+            ILogger<ManualTradeService> logger, ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient)
         {
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
