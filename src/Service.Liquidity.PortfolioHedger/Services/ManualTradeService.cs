@@ -23,16 +23,21 @@ namespace Service.Liquidity.PortfolioHedger.Services
         private readonly ExchangeTradeWriter _exchangeTradeWriter;
         private readonly ILogger<ManualTradeService> _logger;
         private readonly ISpotInstrumentDictionaryClient _spotInstrumentDictionaryClient;
+        private readonly HedgerMetricsInterceptor _hedgerMetricsInterceptor;
 
         public ManualTradeService(IExternalExchangeManager externalExchangeManager,
-            IExternalMarket externalMarket, ExchangeTradeWriter exchangeTradeWriter,
-            ILogger<ManualTradeService> logger, ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient)
+            IExternalMarket externalMarket,
+            ExchangeTradeWriter exchangeTradeWriter,
+            ILogger<ManualTradeService> logger,
+            ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient,
+            HedgerMetricsInterceptor hedgerMetricsInterceptor)
         {
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
             _exchangeTradeWriter = exchangeTradeWriter;
             _logger = logger;
             _spotInstrumentDictionaryClient = spotInstrumentDictionaryClient;
+            _hedgerMetricsInterceptor = hedgerMetricsInterceptor;
         }
 
         public async Task<ManualTradeResponse> CreateManualTradeAsync(CreateManualTradeRequest request)
@@ -66,6 +71,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     Comment = request.Comment,
                     User = request.User
                 };
+                _hedgerMetricsInterceptor.SetExecuteTradeMetrics(request);
                 await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
             }
             catch (Exception exception)
@@ -134,6 +140,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             };
             try
             {
+                _hedgerMetricsInterceptor.SetReportTradeMetrics(request);
                 await _exchangeTradeWriter.PublishTrade(trade);
             }
             catch (Exception exception)

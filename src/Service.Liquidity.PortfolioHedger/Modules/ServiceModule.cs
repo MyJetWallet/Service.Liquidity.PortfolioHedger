@@ -30,6 +30,11 @@ namespace Service.Liquidity.PortfolioHedger.Modules
                 .RegisterType<ExchangeTradeWriter>()
                 .AsSelf()
                 .SingleInstance();
+            
+            builder
+                .RegisterType<HedgerMetricsInterceptor>()
+                .AsSelf()
+                .SingleInstance();
         }
     }
 }
