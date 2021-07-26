@@ -32,7 +32,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
                 .SingleInstance();
             
             builder
-                .RegisterType<HedgerMetricsInterceptor>()
+                .RegisterType<HedgerMetrics>()
                 .AsSelf()
                 .SingleInstance();
         }

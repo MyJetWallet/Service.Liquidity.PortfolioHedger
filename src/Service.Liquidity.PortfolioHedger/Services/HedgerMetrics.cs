@@ -6,7 +6,7 @@ using Service.Liquidity.PortfolioHedger.ServiceBus;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {
-    public class HedgerMetricsInterceptor : Interceptor
+    public class HedgerMetrics
     {
         private static readonly Counter ManualTradeReportCounter = Metrics
             .CreateCounter("jet_portfolio_report_trade",
