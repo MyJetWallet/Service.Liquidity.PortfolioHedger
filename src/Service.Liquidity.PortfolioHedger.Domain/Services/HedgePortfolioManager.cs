@@ -6,10 +6,13 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
     public class HedgePortfolioManager : IHedgePortfolioManager
     {
         private readonly IExchangeTradeManager _exchangeTradeManager;
-
-        public HedgePortfolioManager(IExchangeTradeManager exchangeTradeManager)
+        private readonly ExchangeTradeWriter _exchangeTradeWriter;
+        
+        public HedgePortfolioManager(IExchangeTradeManager exchangeTradeManager,
+            ExchangeTradeWriter exchangeTradeWriter)
         {
             _exchangeTradeManager = exchangeTradeManager;
+            _exchangeTradeWriter = exchangeTradeWriter;
         }
 
         public decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
@@ -44,6 +47,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
 
         public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
         {
+            
+            //await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
+            
             throw new System.NotImplementedException();
         }
 
