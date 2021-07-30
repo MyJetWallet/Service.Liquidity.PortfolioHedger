@@ -11,15 +11,24 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         public List<ExternalMarketTrade> GetTradesForExternalMarket(List<string> externalMarkets, string fromAsset, 
             string toAsset, decimal fromVolume, decimal toVolume);
 
-        public ExecuteTradesResult ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades);
+        public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades);
+
+        public ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset);
     }
 
-    public class ExecuteTradesResult
+    public class ExecutedTrade
     {
-        public string BaseAsset { get; set; }
-        public string QuoteAsset { get; set; }
+        public ExternalMarketTrade Trade { get; set; }
         public decimal ExecutedBaseVolume { get; set; }
         public decimal ExecutedQuoteVolume { get; set; }
+    }
+
+    public class ExecutedVolumes
+    {
+        public string FromAsset { get; set; }
+        public string ToAsset { get; set; }
+        public decimal ExecutedFromVolume { get; set; }
+        public decimal ExecutedToVolume { get; set; }
     }
 
     public class ExternalMarketTrade

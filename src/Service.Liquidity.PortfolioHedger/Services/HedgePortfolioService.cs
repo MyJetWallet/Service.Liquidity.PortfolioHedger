@@ -13,7 +13,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             _hedgePortfolioManager = hedgePortfolioManager;
         }
 
-        public Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
+        public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
         {
             var toVolume =
                 _hedgePortfolioManager.GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
@@ -21,9 +21,18 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
             var tradesForExternalMarkets = _hedgePortfolioManager.GetTradesForExternalMarket(externalMarkets,
                 request.FromAsset, request.ToAsset, request.FromAssetVolume, toVolume);
-            
-            
-            return null;
+
+            var executedTrades = _hedgePortfolioManager.ExecuteExternalMarketTrades(tradesForExternalMarkets);
+
+            var executedVolumes =
+                _hedgePortfolioManager.GetExecutedVolumesInRequestAssets(executedTrades, request.FromAsset,
+                    request.ToAsset);
+
+            return new ExecuteManualConvertResponse()
+            {
+                ExecutedFromValue = executedVolumes.ExecutedFromVolume,
+                ExecutedToValue = executedVolumes.ExecutedToVolume
+            };
         }
     }
 }

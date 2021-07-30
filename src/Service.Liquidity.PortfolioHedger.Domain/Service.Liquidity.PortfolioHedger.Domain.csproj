@@ -6,11 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="DotNetCoreDecorators" Version="1.0.21" />
+    <PackageReference Include="prometheus-net" Version="4.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.Domain.Models\Service.Liquidity.PortfolioHedger.Domain.Models.csproj" />
-    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
   </ItemGroup>
 
 </Project>

@@ -20,7 +20,12 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             throw new System.NotImplementedException();
         }
 
-        public ExecuteTradesResult ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
+        public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset)
         {
             throw new System.NotImplementedException();
         }
