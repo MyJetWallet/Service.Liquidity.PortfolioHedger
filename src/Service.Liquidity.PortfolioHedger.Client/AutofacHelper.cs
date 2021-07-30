@@ -4,6 +4,7 @@ using DotNetCoreDecorators;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.ServiceBus;
 

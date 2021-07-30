@@ -11,4 +11,8 @@
       <PackageReference Include="MyServiceBus.TcpClient" Version="2.4.4" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.Domain.Models\Service.Liquidity.PortfolioHedger.Domain.Models.csproj" />
+    </ItemGroup>
+
 </Project>

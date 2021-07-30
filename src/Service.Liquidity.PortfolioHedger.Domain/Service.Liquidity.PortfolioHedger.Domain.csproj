@@ -4,4 +4,13 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="DotNetCoreDecorators" Version="1.0.21" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.Domain.Models\Service.Liquidity.PortfolioHedger.Domain.Models.csproj" />
+    <ProjectReference Include="..\Service.Liquidity.PortfolioHedger.ServiceBus\Service.Liquidity.PortfolioHedger.ServiceBus.csproj" />
+  </ItemGroup>
+
 </Project>

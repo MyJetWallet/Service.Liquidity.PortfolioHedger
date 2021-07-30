@@ -5,6 +5,7 @@ using MyJetWallet.Domain.ServiceBus;
 using MyJetWallet.Domain.ServiceBus.Serializers;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.ServiceBus
 {

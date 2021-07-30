@@ -4,6 +4,8 @@ using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.Liquidity.Monitoring.Domain.Models;
 using Service.Liquidity.Portfolio.Domain.Models;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
+using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Job;
 using Service.Liquidity.PortfolioHedger.ServiceBus;
 using Service.Liquidity.PortfolioHedger.Services;
@@ -34,6 +36,11 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder
                 .RegisterType<HedgerMetrics>()
                 .AsSelf()
+                .SingleInstance();
+            
+            builder
+                .RegisterType<HedgePortfolioManager>()
+                .As<IHedgePortfolioManager>()
                 .SingleInstance();
         }
     }

@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Service.Liquidity.PortfolioHedger.Grpc.Models
+namespace Service.Liquidity.PortfolioHedger.Domain.Models
 {
     [DataContract]
     public class ReportManualTradeRequest

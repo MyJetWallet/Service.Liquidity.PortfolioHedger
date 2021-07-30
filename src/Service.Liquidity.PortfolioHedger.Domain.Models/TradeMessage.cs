@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using MyJetWallet.Domain.Orders;
 
-namespace Service.Liquidity.PortfolioHedger.ServiceBus
+namespace Service.Liquidity.PortfolioHedger.Domain.Models
 {
     [DataContract]
     public class TradeMessage

@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
-using Service.Liquidity.PortfolioHedger.ServiceBus;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 
-namespace Service.Liquidity.PortfolioHedger.Services
+namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
     public class ExchangeTradeWriter
     {

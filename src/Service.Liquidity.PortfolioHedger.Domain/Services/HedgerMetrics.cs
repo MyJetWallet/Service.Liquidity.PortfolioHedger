@@ -1,10 +1,7 @@
-﻿using System;
-using Grpc.Core.Interceptors;
-using Prometheus;
-using Service.Liquidity.PortfolioHedger.Grpc.Models;
-using Service.Liquidity.PortfolioHedger.ServiceBus;
+﻿using Prometheus;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 
-namespace Service.Liquidity.PortfolioHedger.Services
+namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
     public class HedgerMetrics
     {

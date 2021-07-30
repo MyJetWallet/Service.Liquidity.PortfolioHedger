@@ -10,6 +10,8 @@ using MyJetWallet.Domain.Orders;
 using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
 using Service.AssetsDictionary.Client;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
+using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
 using Service.Liquidity.PortfolioHedger.ServiceBus;
