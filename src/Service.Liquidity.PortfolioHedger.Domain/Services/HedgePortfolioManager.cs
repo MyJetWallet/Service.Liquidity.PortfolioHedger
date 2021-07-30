@@ -1,9 +1,17 @@
 using System.Collections.Generic;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
     public class HedgePortfolioManager : IHedgePortfolioManager
     {
+        private readonly IExchangeTradeManager _exchangeTradeManager;
+
+        public HedgePortfolioManager(IExchangeTradeManager exchangeTradeManager)
+        {
+            _exchangeTradeManager = exchangeTradeManager;
+        }
+
         public decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
         {
             throw new System.NotImplementedException();
@@ -17,7 +25,21 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         public List<ExternalMarketTrade> GetTradesForExternalMarket(List<string> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
             decimal toVolume)
         {
-            throw new System.NotImplementedException();
+            var tradesByExchanges = new List<ExternalMarketTrade>();
+            foreach (var externalMarket in externalMarkets)
+            {
+                // получить с каждого рынка доступные ордера с учтом баланса и верхней граници сделки
+                var availableOrders = _exchangeTradeManager.GetAvailableOrders(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+
+                // Сортируем агрегированный ордербук по цене
+                var sortedOrderBook = _exchangeTradeManager.GetSortedOrderBook(availableOrders);
+
+                // Наберем нужный обьем по агрегированному ордербуку
+                var tradeByExchange = _exchangeTradeManager.GetTradeByExchange(sortedOrderBook);
+                
+                tradesByExchanges.Add(tradeByExchange);
+            }
+            return tradesByExchanges;
         }
 
         public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
