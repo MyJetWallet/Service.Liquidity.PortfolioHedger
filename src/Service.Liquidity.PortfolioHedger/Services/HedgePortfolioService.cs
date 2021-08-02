@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using Service.IndexPrices.Client;
 using Service.Liquidity.PortfolioHedger.Domain;
-using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 
 namespace Service.Liquidity.PortfolioHedger.Services
@@ -20,7 +19,6 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
         public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
         {
-            //по индекс цене расчитываем Amount 2
             var toVolume = GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
 
             var brokerId = Program.Settings.DefaultBrokerId;

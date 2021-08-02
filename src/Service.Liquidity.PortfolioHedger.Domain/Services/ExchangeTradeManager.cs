@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
@@ -21,24 +19,17 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             var orderBookLevels = new List<Level>();
             foreach (var externalMarket in externalMarkets)
             {
-                // получить с каждого рынка доступные ордера с учтом баланса и верхней граници сделки
                 var levels = await GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
                 orderBookLevels.AddRange(levels);
-            }               
-            
-            // Сортируем агрегированный ордербук по цене
+            }
             var sortedOrderBook = GetSortedOrderBook(orderBookLevels);
-
-            // отрезаем по объему 
             var ordersToExecute = GetOrdersToExecute(sortedOrderBook, fromVolume);
-            
-            // Наберем нужный обьем по агрегированному ордербуку
             var tradesByExchange = GetTradeByExchange(ordersToExecute, externalMarkets);
             
             return tradesByExchange;
         }
 
-        private List<Level> GetOrdersToExecute(List<Level> sortedOrderBook, decimal budget)
+        private IEnumerable<Level> GetOrdersToExecute(IReadOnlyList<Level> sortedOrderBook, decimal budget)
         {
             var ordersToExecute = new List<Level>();
             
@@ -48,7 +39,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                     
                 if (budget == 0)
                     break;
-                    
                 if ((decimal)level.NormalizeLevel.Volume <= budget)
                 {
                     budget -= (decimal) level.NormalizeLevel.Volume;
@@ -66,12 +56,10 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                         level.NormalizeLevel.Volume = (double) budget;
                         level.OriginalLevel.Volume = (double) (budget / (decimal) level.OriginalLevel.Price);
                     }
-
                     budget = 0;
                     ordersToExecute.Add(level);
                 }
             }
-
             return ordersToExecute;
         }
 
@@ -81,12 +69,12 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 toVolume);
         }
 
-        private List<Level> GetSortedOrderBook(List<Level> availableOrders)
+        private List<Level> GetSortedOrderBook(IEnumerable<Level> availableOrders)
         {
             return availableOrders.OrderByDescending(e => e.NormalizeLevel.Price).ToList();
         }
 
-        private List<ExternalMarketTrade> GetTradeByExchange(List<Level> orders, List<ExternalMarket> externalMarkets)
+        private List<ExternalMarketTrade> GetTradeByExchange(IEnumerable<Level> orders, IReadOnlyCollection<ExternalMarket> externalMarkets)
         {
             return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
             {

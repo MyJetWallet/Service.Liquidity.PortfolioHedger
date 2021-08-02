@@ -20,17 +20,13 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             _orderBookSource = orderBookSource;
             _externalMarket = externalMarket;
         }
-
-        // todo: вынести в отдельный класс
-        // если а - base, b - quote - то берем BUY ордера 
-        // смотрим баланс, если баланса меньше - то уменьшаем объем до баланса
-        // берем то что меньше - баланс или требуемый объем
+        
         public async Task<List<Level>> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume,
             decimal toVolume)
         {
-            var orderbook = await GetOrderBookFromExchangeAsync(externalMarket, fromAsset, toAsset);
+            var orderbook = await GetOrderBookFromExchangeAsync(externalMarket);
             
-            List<Level> availableLevels = new List<Level>();
+            var availableLevels = new List<Level>();
             
             if (externalMarket.MarketInfo.AssociateBaseAsset == fromAsset)
             {
@@ -45,7 +41,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                     
                     if (budget == 0)
                         break;
-                    
                     if (level.Volume <= budget)
                     {
                         budget -= level.Volume;
@@ -81,7 +76,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 
                 var balance = await GetAvailableBalance(externalMarket.Exchange, toAsset);
                 var budget = Convert.ToDouble(Math.Min(balance, toVolume));
-                
                 var allLevels = orderbook.Asks.OrderBy(e => e.Price).ToList();
                 
                 for (var i = 0; i < allLevels.Count; i++)
@@ -131,7 +125,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return availableLevels;
         }
         
-        private async Task<LeOrderBook> GetOrderBookFromExchangeAsync(ExternalMarket externalMarket, string fromAsset, string toAsset)
+        private async Task<LeOrderBook> GetOrderBookFromExchangeAsync(ExternalMarket externalMarket)
         {
             var response = await _orderBookSource.GetOrderBookAsync(new MarketRequest()
             {
@@ -148,9 +142,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             {
                 ExchangeName = exchange
             });
-
             var balanceByMarket = balances.Balances.FirstOrDefault(e => e.Symbol == asset);
-            
             var availableBalance = (balanceByMarket?.Balance ?? 0) * 0.8m; // todo: GO TO NOSQL
 
             return availableBalance;

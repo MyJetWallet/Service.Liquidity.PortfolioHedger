@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,17 +29,13 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         
         public async Task<ExecutedVolumes> ExecuteHedgeConvert(string brokerId, string fromAsset, string toAsset, decimal fromAssetVolume, decimal toAssetVolume)
         {
-            //найти внешнии рынки на которых мы можем обменять Asset1 и Asset2
             var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
-
-            // резделить обьем между биржами
+            
             var tradesForExternalMarkets = await GetTradesForExternalMarketAsync(externalMarkets,
                 fromAsset, toAsset, fromAssetVolume, toAssetVolume);
-
-            // выполнить трейды согластно плану
+            
             var executedTrades = await ExecuteExternalMarketTrades(tradesForExternalMarkets, brokerId);
-
-            // посчитать ExecutedVolume по факту
+            
             return GetExecutedVolumesInRequestAssets(executedTrades, fromAsset, toAsset);
         }
 
@@ -68,7 +63,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                         MarketInfo = exchangeMarketInfo
                     });
             }
-
             return availableExchanges;
         }
 
@@ -80,7 +74,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         }
 
         private async Task<List<ExecutedTrade>> ExecuteExternalMarketTrades(
-            List<ExternalMarketTrade> externalMarketTrades, string brokerId)
+            IEnumerable<ExternalMarketTrade> externalMarketTrades, string brokerId)
         {
             var marketTrades = new List<ExecutedTrade>();
             foreach (var trade in externalMarketTrades)
@@ -122,13 +116,23 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                     ExecutedQuoteVolume = (decimal) marketTrade.OppositeVolume
                 });
             }
-
             return marketTrades;
         }
-
-        private ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset)
+        
+        private ExecutedVolumes GetExecutedVolumesInRequestAssets(IReadOnlyCollection<ExecutedTrade> executedTrades, string fromAsset, string toAsset)
         {
-            throw new System.NotImplementedException();
+            var executedVolumes = new ExecutedVolumes
+            {
+                FromAsset = fromAsset,
+                ToAsset = toAsset,
+                ExecutedFromVolume = executedTrades.Where(e => e.Trade.BaseAsset == fromAsset)
+                    .Sum(e => e.ExecutedBaseVolume) + executedTrades.Where(e => e.Trade.BaseAsset == toAsset)
+                    .Sum(e => e.ExecutedQuoteVolume),
+                ExecutedToVolume = executedTrades.Where(e => e.Trade.BaseAsset == fromAsset)
+                    .Sum(e => e.ExecutedQuoteVolume) + executedTrades.Where(e => e.Trade.BaseAsset == toAsset)
+                    .Sum(e => e.ExecutedBaseVolume)
+            };
+            return executedVolumes;
         }
     }
 }

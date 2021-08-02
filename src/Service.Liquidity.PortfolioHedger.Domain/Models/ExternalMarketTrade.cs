@@ -1,5 +1,3 @@
-using MyJetWallet.Domain.Orders;
-
 namespace Service.Liquidity.PortfolioHedger.Domain.Models
 {
     public class ExternalMarketTrade
