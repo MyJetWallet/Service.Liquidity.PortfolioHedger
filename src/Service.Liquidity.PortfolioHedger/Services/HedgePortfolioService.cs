@@ -20,7 +20,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
                 _hedgePortfolioManager.GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
             
             //найти внешнии рынки на которых мы можем обменять Asset1 и Asset2
-            var externalMarkets = _hedgePortfolioManager.GetAvailableExternalMarkets(request.FromAsset, request.ToAsset);
+            var externalMarkets = await _hedgePortfolioManager.GetAvailableExternalMarketsAsync(request.FromAsset, request.ToAsset);
 
             // резделить обьем между биржами
             var tradesForExternalMarkets = _hedgePortfolioManager.GetTradesForExternalMarket(externalMarkets,

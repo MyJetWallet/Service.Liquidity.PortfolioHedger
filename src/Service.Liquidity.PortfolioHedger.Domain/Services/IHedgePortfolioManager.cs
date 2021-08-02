@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
@@ -7,7 +8,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
     {
         public decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume);
 
-        public List<string> GetAvailableExternalMarkets(string fromAsset, string toAsset);
+        public Task<List<string>> GetAvailableExternalMarketsAsync(string fromAsset, string toAsset);
 
         public List<ExternalMarketTrade> GetTradesForExternalMarket(List<string> externalMarkets, string fromAsset, 
             string toAsset, decimal fromVolume, decimal toVolume);

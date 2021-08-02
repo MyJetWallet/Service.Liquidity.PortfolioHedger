@@ -2,6 +2,7 @@ using Autofac;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Sdk.NoSql;
 using Service.AssetsDictionary.Client;
+using Service.IndexPrices.Client;
 
 namespace Service.Liquidity.PortfolioHedger.Modules
 {
@@ -13,6 +14,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder.RegisterAssetsDictionaryClients(myNoSqlClient);
             
             builder.RegisterExternalMarketClient(Program.Settings.ExternalApiGrpcUrl);
+            builder.RegisterIndexPricesClient(myNoSqlClient);
         }
     }
 }
