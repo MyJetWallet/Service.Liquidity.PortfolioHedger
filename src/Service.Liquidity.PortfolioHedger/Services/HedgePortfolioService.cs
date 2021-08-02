@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using Service.IndexPrices.Client;
+using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 
@@ -7,38 +9,37 @@ namespace Service.Liquidity.PortfolioHedger.Services
     public class HedgePortfolioService : IHedgePortfolioService
     {
         private readonly IHedgePortfolioManager _hedgePortfolioManager;
+        private readonly IIndexPricesClient _indexPricesClient;
 
-        public HedgePortfolioService(IHedgePortfolioManager hedgePortfolioManager)
+        public HedgePortfolioService(IHedgePortfolioManager hedgePortfolioManager,
+            IIndexPricesClient indexPricesClient)
         {
             _hedgePortfolioManager = hedgePortfolioManager;
+            _indexPricesClient = indexPricesClient;
         }
 
         public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
         {
             //по индекс цене расчитываем Amount 2
-            var toVolume =
-                _hedgePortfolioManager.GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
-            
-            //найти внешнии рынки на которых мы можем обменять Asset1 и Asset2
-            var externalMarkets = await _hedgePortfolioManager.GetAvailableExchangesAsync(request.FromAsset, request.ToAsset);
+            var toVolume = GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
 
-            // резделить обьем между биржами
-            var tradesForExternalMarkets = await _hedgePortfolioManager.GetTradesForExternalMarketAsync(externalMarkets,
-                request.FromAsset, request.ToAsset, request.FromAssetVolume, toVolume);
-
-            // выполнить трейды согластно плану
-            var executedTrades = _hedgePortfolioManager.ExecuteExternalMarketTrades(tradesForExternalMarkets);
-
-            // посчитать ExecutedVolume по факту
-            var executedVolumes =
-                _hedgePortfolioManager.GetExecutedVolumesInRequestAssets(executedTrades, request.FromAsset,
-                    request.ToAsset);
+            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(request.FromAsset, request.ToAsset,
+                request.FromAssetVolume, toVolume);
 
             return new ExecuteManualConvertResponse()
             {
                 ExecutedFromValue = executedVolumes.ExecutedFromVolume,
                 ExecutedToValue = executedVolumes.ExecutedToVolume
             };
+        }
+
+        private decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
+        {
+            var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
+            var toAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(toAsset);
+            
+            var toVolume = fromVolume * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
+            return toVolume;
         }
     }
 }

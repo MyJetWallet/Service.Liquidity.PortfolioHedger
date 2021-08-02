@@ -4,6 +4,7 @@ using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.Liquidity.Monitoring.Domain.Models;
 using Service.Liquidity.Portfolio.Domain.Models;
+using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Job;
@@ -43,6 +44,10 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder
                 .RegisterType<ExchangeTradeManager>()
                 .As<IExchangeTradeManager>()
+                .SingleInstance();
+            builder
+                .RegisterType<OrderBookManager>()
+                .As<IOrderBookManager>()
                 .SingleInstance();
         }
     }

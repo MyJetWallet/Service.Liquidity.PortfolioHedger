@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
-using Service.IndexPrices.Client;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
@@ -12,33 +11,37 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
     {
         private readonly IExchangeTradeManager _exchangeTradeManager;
         private readonly ExchangeTradeWriter _exchangeTradeWriter;
-        private readonly IIndexPricesClient _indexPricesClient;
         private readonly IExternalExchangeManager _externalExchangeManager;
         private readonly IExternalMarket _externalMarket;
         
         public HedgePortfolioManager(IExchangeTradeManager exchangeTradeManager,
             ExchangeTradeWriter exchangeTradeWriter,
-            IIndexPricesClient indexPricesClient,
             IExternalExchangeManager externalExchangeManager,
             IExternalMarket externalMarket)
         {
             _exchangeTradeManager = exchangeTradeManager;
             _exchangeTradeWriter = exchangeTradeWriter;
-            _indexPricesClient = indexPricesClient;
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
         }
-
-        public decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
+        
+        public async Task<ExecutedVolumes> ExecuteHedgeConvert(string fromAsset, string toAsset, decimal fromAssetVolume, decimal toAssetVolume)
         {
-            var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
-            var toAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(toAsset);
-            
-            var toVolume = fromVolume * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
-            return toVolume;
+            //найти внешнии рынки на которых мы можем обменять Asset1 и Asset2
+            var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
+
+            // резделить обьем между биржами
+            var tradesForExternalMarkets = await GetTradesForExternalMarketAsync(externalMarkets,
+                fromAsset, toAsset, fromAssetVolume, toAssetVolume);
+
+            // выполнить трейды согластно плану
+            var executedTrades = ExecuteExternalMarketTrades(tradesForExternalMarkets);
+
+            // посчитать ExecutedVolume по факту
+            return GetExecutedVolumesInRequestAssets(executedTrades, fromAsset, toAsset);
         }
 
-        public async Task<List<ExternalMarket>> GetAvailableExchangesAsync(string fromAsset, string toAsset)
+        private async Task<List<ExternalMarket>> GetAvailableExchangesAsync(string fromAsset, string toAsset)
         {
             var exchanges = (await _externalExchangeManager.GetExternalExchangeCollectionAsync()).ExchangeNames;
 
@@ -66,27 +69,14 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return availableExchanges;
         }
 
-        public async Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(List<ExternalMarket> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
+        private async Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(List<ExternalMarket> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
             decimal toVolume)
         {
-            var tradesByExchanges = new List<ExternalMarketTrade>();
-            foreach (var externalMarket in externalMarkets)
-            {
-                // получить с каждого рынка доступные ордера с учтом баланса и верхней граници сделки
-                var availableOrders = await _exchangeTradeManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+            return await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, fromAsset, toAsset, fromVolume, toVolume);
 
-                // Сортируем агрегированный ордербук по цене
-                var sortedOrderBook = _exchangeTradeManager.GetSortedOrderBook(availableOrders);
-
-                // Наберем нужный обьем по агрегированному ордербуку
-                var tradeByExchange = _exchangeTradeManager.GetTradeByExchange(sortedOrderBook);
-                
-                tradesByExchanges.Add(tradeByExchange);
-            }
-            return tradesByExchanges;
         }
 
-        public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
+        private List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
         {
             
             //await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
@@ -94,7 +84,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             throw new System.NotImplementedException();
         }
 
-        public ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset)
+        private ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset)
         {
             throw new System.NotImplementedException();
         }
