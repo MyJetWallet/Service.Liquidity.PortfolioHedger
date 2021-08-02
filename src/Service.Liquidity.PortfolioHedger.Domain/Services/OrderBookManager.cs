@@ -52,7 +52,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                         availableLevels.Add(new Level()
                         {
                             OriginalLevel = level,
-                            NormalizeLevel = level
+                            NormalizeLevel = level,
+                            NormalizeIsOriginal = true,
+                            Exchange = externalMarket.Exchange
                         });
                     } 
                     else 
@@ -65,7 +67,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                             availableLevels.Add(new Level()
                             {
                                 OriginalLevel = level,
-                                NormalizeLevel = level
+                                NormalizeLevel = level,
+                                NormalizeIsOriginal = true,
+                                Exchange = externalMarket.Exchange
                             });
                         }
                     }
@@ -97,7 +101,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                             {
                                 Price = 1 / level.Price,
                                 Volume = -(level.Volume * level.Price)
-                            }
+                            },
+                            NormalizeIsOriginal = false,
+                            Exchange = externalMarket.Exchange
                         });
                     } 
                     else 
@@ -114,7 +120,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                                 {
                                     Price = 1 / level.Price,
                                     Volume = -(level.Volume * level.Price)
-                                }
+                                },
+                                NormalizeIsOriginal = false,
+                                Exchange = externalMarket.Exchange
                             });
                         }
                     }

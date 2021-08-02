@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
+using MyJetWallet.Domain.ExternalMarketApi.Dto;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
@@ -78,6 +79,10 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
 
         private List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
         {
+            _externalMarket.MarketTrade(new MarketTradeRequest()
+            {
+                
+            })
             
             //await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
             
