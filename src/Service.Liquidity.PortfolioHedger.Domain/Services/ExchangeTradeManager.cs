@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
@@ -15,36 +16,43 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
 
         public async Task<List<ExternalMarketTrade>> GetTradesByExternalMarkets(List<ExternalMarket> externalMarkets, string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
         {
-            var tradesByExchanges = new List<ExternalMarketTrade>();
+            var orderBookLevels = new List<Level>();
             foreach (var externalMarket in externalMarkets)
             {
                 // получить с каждого рынка доступные ордера с учтом баланса и верхней граници сделки
-                var availableOrders = await GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+                var levels = await GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+                orderBookLevels.AddRange(levels);
+            }               
+            
+            // Сортируем агрегированный ордербук по цене
+            var sortedOrderBook = GetSortedOrderBook(orderBookLevels);
 
-                // Сортируем агрегированный ордербук по цене
-                var sortedOrderBook = GetSortedOrderBook(availableOrders);
-
-                // Наберем нужный обьем по агрегированному ордербуку
-                var tradeByExchange = GetTradeByExchange(sortedOrderBook);
-                
-                tradesByExchanges.Add(tradeByExchange);
-            }
-            return tradesByExchanges;
-        }
-        
-        private async Task<bool> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
-        {
-            return await _orderBookManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume,
-                toVolume);
-
+            // отрезаем по объему 
+            var ordersToExecute = GetOrdersToExecute(sortedOrderBook);
+            
+            // Наберем нужный обьем по агрегированному ордербуку
+            var tradesByExchange = GetTradeByExchange(ordersToExecute);
+            
+            return tradesByExchange;
         }
 
-        private bool GetSortedOrderBook(bool availableOrders)
+        private List<Level> GetOrdersToExecute(List<LeOrderBookLevel> sortedOrderBook)
         {
             throw new System.NotImplementedException();
         }
 
-        private ExternalMarketTrade GetTradeByExchange(bool orderBook)
+        private async Task<List<Level>> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
+        {
+            return await _orderBookManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume,
+                toVolume);
+        }
+
+        private List<LeOrderBookLevel> GetSortedOrderBook(List<Level> availableOrders)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        private List<ExternalMarketTrade> GetTradeByExchange(List<Level> orders)
         {
             throw new System.NotImplementedException();
         }
