@@ -88,11 +88,11 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
 
         private List<ExternalMarketTrade> GetTradeByExchange(List<Level> orders)
         {
-            return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
-            {
-                Exchange = e.Key,
-                Symbol
-            });
+            return null;
+            //return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
+            //{
+            //    Exchange = e.Key
+            //});
         }
     }
 }

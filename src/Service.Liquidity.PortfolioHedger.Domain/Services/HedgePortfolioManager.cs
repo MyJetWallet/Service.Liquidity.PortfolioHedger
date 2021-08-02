@@ -81,8 +81,8 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         {
             _externalMarket.MarketTrade(new MarketTradeRequest()
             {
-                
-            })
+
+            });
             
             //await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
             
