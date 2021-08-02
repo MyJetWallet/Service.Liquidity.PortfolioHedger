@@ -23,7 +23,8 @@ namespace Service.Liquidity.PortfolioHedger.Services
             //по индекс цене расчитываем Amount 2
             var toVolume = GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
 
-            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(request.FromAsset, request.ToAsset,
+            var brokerId = Program.Settings.DefaultBrokerId;
+            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(brokerId, request.FromAsset, request.ToAsset,
                 request.FromAssetVolume, toVolume);
 
             return new ExecuteManualConvertResponse()

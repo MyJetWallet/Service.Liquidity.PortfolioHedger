@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
+using MyJetWallet.Domain.Orders;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
@@ -26,7 +28,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             _externalMarket = externalMarket;
         }
         
-        public async Task<ExecutedVolumes> ExecuteHedgeConvert(string fromAsset, string toAsset, decimal fromAssetVolume, decimal toAssetVolume)
+        public async Task<ExecutedVolumes> ExecuteHedgeConvert(string brokerId, string fromAsset, string toAsset, decimal fromAssetVolume, decimal toAssetVolume)
         {
             //найти внешнии рынки на которых мы можем обменять Asset1 и Asset2
             var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
@@ -36,7 +38,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 fromAsset, toAsset, fromAssetVolume, toAssetVolume);
 
             // выполнить трейды согластно плану
-            var executedTrades = ExecuteExternalMarketTrades(tradesForExternalMarkets);
+            var executedTrades = await ExecuteExternalMarketTrades(tradesForExternalMarkets, brokerId);
 
             // посчитать ExecutedVolume по факту
             return GetExecutedVolumesInRequestAssets(executedTrades, fromAsset, toAsset);
@@ -77,16 +79,51 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
 
         }
 
-        private List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades)
+        private async Task<List<ExecutedTrade>> ExecuteExternalMarketTrades(
+            List<ExternalMarketTrade> externalMarketTrades, string brokerId)
         {
-            _externalMarket.MarketTrade(new MarketTradeRequest()
+            var marketTrades = new List<ExecutedTrade>();
+            foreach (var trade in externalMarketTrades)
             {
+                var marketTradeRequest = new MarketTradeRequest
+                {
+                    ExchangeName = trade.ExchangeName,
+                    Volume = (double) trade.BaseVolume,
+                    Side = trade.BaseVolume > 0 ? OrderSide.Buy : OrderSide.Sell,
+                    Market = trade.Market
+                };
+            
+                var marketTrade = await _externalMarket.MarketTrade(marketTradeRequest);
+            
+                var exchangeTradeMessage = new TradeMessage()
+                {
+                    AssociateBrokerId = brokerId,
+                    BaseAsset = trade.BaseAsset,
+                    QuoteAsset = trade.QuoteAsset,
+                    AssociateClientId = marketTrade.AssociateClientId,
+                    AssociateSymbol = marketTrade.Market,
+                    AssociateWalletId = trade.ExchangeName,
+                    Id = marketTrade.Id,
+                    Market = marketTrade.Market,
+                    Volume = marketTrade.Volume,
+                    Timestamp = marketTrade.Timestamp,
+                    OppositeVolume = marketTrade.OppositeVolume,
+                    Price = marketTrade.Price,
+                    ReferenceId = marketTrade.ReferenceId,
+                    Side = marketTrade.Side,
+                    Source = marketTrade.Source
+                };
+                await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
 
-            });
-            
-            //await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
-            
-            throw new System.NotImplementedException();
+                marketTrades.Add(new ExecutedTrade()
+                {
+                    Trade = trade,
+                    ExecutedBaseVolume = (decimal) marketTrade.Volume,
+                    ExecutedQuoteVolume = (decimal) marketTrade.OppositeVolume
+                });
+            }
+
+            return marketTrades;
         }
 
         private ExecutedVolumes GetExecutedVolumesInRequestAssets(List<ExecutedTrade> executedTrades, string fromAsset, string toAsset)

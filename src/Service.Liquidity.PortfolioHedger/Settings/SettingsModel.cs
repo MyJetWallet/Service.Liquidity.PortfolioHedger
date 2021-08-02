@@ -25,5 +25,8 @@ namespace Service.Liquidity.PortfolioHedger.Settings
 
         [YamlProperty("LiquidityPortfolioHedger.MyNoSqlReaderHostPort")]
         public string MyNoSqlReaderHostPort { get; set; }
+        
+        [YamlProperty("LiquidityPortfolioHedger.DefaultBrokerId")]
+        public string DefaultBrokerId { get; set; }
     }
 }

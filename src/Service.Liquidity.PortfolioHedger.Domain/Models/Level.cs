@@ -7,7 +7,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Models
         public string Exchange { get; set; }
         public LeOrderBookLevel OriginalLevel { get; set; }
         public LeOrderBookLevel NormalizeLevel { get; set; }
-        
         public bool NormalizeIsOriginal { get; set; }
     }
 }

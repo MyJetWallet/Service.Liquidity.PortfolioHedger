@@ -33,7 +33,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             var ordersToExecute = GetOrdersToExecute(sortedOrderBook, fromVolume);
             
             // Наберем нужный обьем по агрегированному ордербуку
-            var tradesByExchange = GetTradeByExchange(ordersToExecute);
+            var tradesByExchange = GetTradeByExchange(ordersToExecute, externalMarkets);
             
             return tradesByExchange;
         }
@@ -86,13 +86,16 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return availableOrders.OrderByDescending(e => e.NormalizeLevel.Price).ToList();
         }
 
-        private List<ExternalMarketTrade> GetTradeByExchange(List<Level> orders)
+        private List<ExternalMarketTrade> GetTradeByExchange(List<Level> orders, List<ExternalMarket> externalMarkets)
         {
-            return null;
-            //return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
-            //{
-            //    Exchange = e.Key
-            //});
+            return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
+            {
+                ExchangeName = e.Key,
+                Market = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.Market).First(),
+                BaseAsset = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.BaseAsset).First(),
+                QuoteAsset = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.QuoteAsset).First(),
+                BaseVolume = e.Sum(q => (decimal) q.OriginalLevel.Volume)
+            }).ToList();
         }
     }
 }
