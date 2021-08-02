@@ -8,9 +8,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
     {
         public decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume);
 
-        public Task<List<string>> GetAvailableExternalMarketsAsync(string fromAsset, string toAsset);
+        public Task<List<ExternalMarket>> GetAvailableExchangesAsync(string fromAsset, string toAsset);
 
-        public List<ExternalMarketTrade> GetTradesForExternalMarket(List<string> externalMarkets, string fromAsset, 
+        public Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(List<ExternalMarket> externalMarkets, string fromAsset, 
             string toAsset, decimal fromVolume, decimal toVolume);
 
         public List<ExecutedTrade> ExecuteExternalMarketTrades(List<ExternalMarketTrade> externalMarketTrades);

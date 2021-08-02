@@ -1,13 +1,24 @@
+using System.Threading.Tasks;
+using MyJetWallet.Domain.ExternalMarketApi;
+using MyJetWallet.Domain.ExternalMarketApi.Dto;
+using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
     public class ExchangeTradeManager : IExchangeTradeManager
     {
-        public bool GetAvailableOrders(string externalMarket, string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
+        private readonly IOrderBookSource _orderBookSource;
+
+        public ExchangeTradeManager(IOrderBookSource orderBookSource)
+        {
+            _orderBookSource = orderBookSource;
+        }
+
+        public async Task<bool> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
         {
             // берем ордербук
-            var orderbook = GetOrderBookFromExchange(externalMarket, fromAsset, toAsset);
+            var orderbook = await GetOrderBookFromExchangeAsync(externalMarket, fromAsset, toAsset);
 
             //обрезаем ордербук по имеющимся балансам
             var sortedByBalance = GetSortedBookByBalance(orderbook);
@@ -23,14 +34,20 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             throw new System.NotImplementedException();
         }
 
-        private object GetSortedBookByBalance(bool orderbook)
+        private object GetSortedBookByBalance(LeOrderBook orderBook)
         {
             throw new System.NotImplementedException();
         }
 
-        private bool GetOrderBookFromExchange(string externalMarket, string fromAsset, string toAsset)
+        private async Task<LeOrderBook> GetOrderBookFromExchangeAsync(ExternalMarket externalMarket, string fromAsset, string toAsset)
         {
-            throw new System.NotImplementedException();
+            var response = await _orderBookSource.GetOrderBookAsync(new MarketRequest()
+            {
+                ExchangeName = externalMarket.Exchange,
+                Market = externalMarket.MarketInfo.Market
+            });
+
+            return response.OrderBook;
         }
 
         public bool GetSortedOrderBook(bool availableOrders)

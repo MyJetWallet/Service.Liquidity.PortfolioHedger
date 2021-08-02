@@ -38,11 +38,11 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return toVolume;
         }
 
-        public async Task<List<string>> GetAvailableExternalMarketsAsync(string fromAsset, string toAsset)
+        public async Task<List<ExternalMarket>> GetAvailableExchangesAsync(string fromAsset, string toAsset)
         {
             var exchanges = (await _externalExchangeManager.GetExternalExchangeCollectionAsync()).ExchangeNames;
 
-            var availableMarkets = new List<string>();
+            var availableExchanges = new List<ExternalMarket>();
             
             foreach (var exchange in exchanges)
             {
@@ -51,25 +51,29 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                     ExchangeName = exchange
                 });
 
-                var marketIsAvailable = exchangeMarkets.Infos
-                    .Any(e => (e.AssociateBaseAsset == fromAsset && e.AssociateQuoteAsset == toAsset) ||
+                var exchangeMarketInfo = exchangeMarkets.Infos
+                    .FirstOrDefault(e => (e.AssociateBaseAsset == fromAsset && e.AssociateQuoteAsset == toAsset) ||
                               (e.AssociateBaseAsset == toAsset && e.AssociateQuoteAsset == fromAsset));
                 
-                if (marketIsAvailable)
-                    availableMarkets.Add(exchange);
+                if (exchangeMarketInfo != null)
+                    availableExchanges.Add(new ExternalMarket()
+                    {
+                        Exchange = exchange,
+                        MarketInfo = exchangeMarketInfo
+                    });
             }
 
-            return availableMarkets;
+            return availableExchanges;
         }
 
-        public List<ExternalMarketTrade> GetTradesForExternalMarket(List<string> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
+        public async Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(List<ExternalMarket> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
             decimal toVolume)
         {
             var tradesByExchanges = new List<ExternalMarketTrade>();
             foreach (var externalMarket in externalMarkets)
             {
                 // получить с каждого рынка доступные ордера с учтом баланса и верхней граници сделки
-                var availableOrders = _exchangeTradeManager.GetAvailableOrders(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+                var availableOrders = await _exchangeTradeManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
 
                 // Сортируем агрегированный ордербук по цене
                 var sortedOrderBook = _exchangeTradeManager.GetSortedOrderBook(availableOrders);
