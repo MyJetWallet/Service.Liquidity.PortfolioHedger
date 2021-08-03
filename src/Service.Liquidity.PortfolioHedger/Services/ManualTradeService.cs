@@ -10,6 +10,7 @@ using MyJetWallet.Domain.Orders;
 using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
 using Service.AssetsDictionary.Client;
+using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
@@ -22,14 +23,14 @@ namespace Service.Liquidity.PortfolioHedger.Services
     {
         private readonly IExternalExchangeManager _externalExchangeManager;
         private readonly IExternalMarket _externalMarket;
-        private readonly ExchangeTradeWriter _exchangeTradeWriter;
+        private readonly IExchangeTradeWriter _exchangeTradeWriter;
         private readonly ILogger<ManualTradeService> _logger;
         private readonly ISpotInstrumentDictionaryClient _spotInstrumentDictionaryClient;
         private readonly HedgerMetrics _hedgerMetrics;
 
         public ManualTradeService(IExternalExchangeManager externalExchangeManager,
             IExternalMarket externalMarket,
-            ExchangeTradeWriter exchangeTradeWriter,
+            IExchangeTradeWriter exchangeTradeWriter,
             ILogger<ManualTradeService> logger,
             ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient,
             HedgerMetrics hedgerMetrics)
