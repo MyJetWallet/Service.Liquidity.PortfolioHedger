@@ -11,7 +11,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
         public async Task<List<Level>> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume,
             decimal toVolume)
         {
-            if (externalMarket.Exchange == "exchange1" && externalMarket.MarketInfo.Market == "BTCUSD")
+            if (externalMarket.ExchangeName == "exchange1" && externalMarket.MarketInfo.Market == "BTCUSD")
             {
                 return new List<Level>()
                 {
@@ -56,6 +56,57 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
                         NormalizeLevel = new LeOrderBookLevel()
                         {
                             Price = 37000,
+                            Volume = 0.05
+                        },
+                        NormalizeIsOriginal = true
+                    }
+                };
+            }
+            if (externalMarket.ExchangeName == "exchange2" && externalMarket.MarketInfo.Market == "BTCUSD")
+            {
+                return new List<Level>()
+                {
+                    new Level()
+                    {
+                        Exchange = "exchange2",
+                        OriginalLevel = new LeOrderBookLevel()
+                        {
+                            Price = 39500,
+                            Volume = 0.1
+                        },
+                        NormalizeLevel = new LeOrderBookLevel()
+                        {
+                            Price = 39500,
+                            Volume = 0.1
+                        },
+                        NormalizeIsOriginal = true
+                    },
+                    new Level()
+                    {
+                        Exchange = "exchange2",
+                        OriginalLevel = new LeOrderBookLevel()
+                        {
+                            Price = 38500,
+                            Volume = 0.1
+                        },
+                        NormalizeLevel = new LeOrderBookLevel()
+                        {
+                            Price = 38500,
+                            Volume = 0.1
+                        },
+                        NormalizeIsOriginal = true
+                    },
+                    new Level()
+                    {
+                        Exchange = "exchange2",
+                        OriginalLevel = new LeOrderBookLevel()
+                        {
+                            Price = 37500,
+                            Volume = 0.05
+                        },
+                        NormalizeLevel = new LeOrderBookLevel()
+                        {
+                            Price = 37500,
                             Volume = 0.05
                         },
                         NormalizeIsOriginal = true

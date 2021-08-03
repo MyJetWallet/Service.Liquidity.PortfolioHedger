@@ -5,9 +5,25 @@ namespace Service.Liquidity.PortfolioHedger.Tests
 {
     public class StaticFieldsForTests
     {
-        public static ExternalMarket ExternalMarket = new ExternalMarket()
+        public static ExternalMarket ExternalMarket1 = new ExternalMarket()
         {
-            Exchange = "exchange1",
+            ExchangeName = "exchange1",
+            MarketInfo = new ExchangeMarketInfo()
+            {
+                AssociateBaseAsset = "BTC",
+                AssociateInstrument = "BTCUSD",
+                AssociateQuoteAsset = "USD",
+                BaseAsset = "BTC",
+                QuoteAsset = "USD",
+                Market = "BTCUSD",
+                MinVolume = 0.01,
+                PriceAccuracy = 2,
+                VolumeAccuracy = 8
+            }
+        };
+        public static ExternalMarket ExternalMarket2 = new ExternalMarket()
+        {
+            ExchangeName = "exchange2",
             MarketInfo = new ExchangeMarketInfo()
             {
                 AssociateBaseAsset = "BTC",

@@ -31,7 +31,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             if (externalMarket.MarketInfo.AssociateBaseAsset == fromAsset)
             {
                 // тратим BASE ассет пока не потратим FROM
-                var balance = await GetAvailableBalance(externalMarket.Exchange, fromAsset);
+                var balance = await GetAvailableBalance(externalMarket.ExchangeName, fromAsset);
                 var budget = Convert.ToDouble(Math.Min(balance, fromVolume));
                 var allLevels = orderbook.Bids.OrderByDescending(e => e.Price).ToList();
                 
@@ -49,7 +49,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                             OriginalLevel = level,
                             NormalizeLevel = level,
                             NormalizeIsOriginal = true,
-                            Exchange = externalMarket.Exchange
+                            Exchange = externalMarket.ExchangeName
                         });
                     } 
                     else 
@@ -64,7 +64,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                                 OriginalLevel = level,
                                 NormalizeLevel = level,
                                 NormalizeIsOriginal = true,
-                                Exchange = externalMarket.Exchange
+                                Exchange = externalMarket.ExchangeName
                             });
                         }
                     }
@@ -74,7 +74,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             {
                 // покупаем BASE ассет пока не купим TO
                 
-                var balance = await GetAvailableBalance(externalMarket.Exchange, toAsset);
+                var balance = await GetAvailableBalance(externalMarket.ExchangeName, toAsset);
                 var budget = Convert.ToDouble(Math.Min(balance, toVolume));
                 var allLevels = orderbook.Asks.OrderBy(e => e.Price).ToList();
                 
@@ -97,7 +97,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                                 Volume = -(level.Volume * level.Price)
                             },
                             NormalizeIsOriginal = false,
-                            Exchange = externalMarket.Exchange
+                            Exchange = externalMarket.ExchangeName
                         });
                     } 
                     else 
@@ -116,7 +116,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                                     Volume = -(level.Volume * level.Price)
                                 },
                                 NormalizeIsOriginal = false,
-                                Exchange = externalMarket.Exchange
+                                Exchange = externalMarket.ExchangeName
                             });
                         }
                     }
@@ -129,7 +129,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         {
             var response = await _orderBookSource.GetOrderBookAsync(new MarketRequest()
             {
-                ExchangeName = externalMarket.Exchange,
+                ExchangeName = externalMarket.ExchangeName,
                 Market = externalMarket.MarketInfo.Market
             });
 

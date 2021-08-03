@@ -72,12 +72,12 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         [Test]
         public async Task Test1()
         {
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket1, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
             
             Assert.AreEqual(StaticFieldsForTests.FromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
             
-            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket.Exchange]
-                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket1.ExchangeName]
+                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset).Balance;
 
             Assert.IsTrue((balance * 0.8m) > (decimal) orders.Sum(e => e.NormalizeLevel.Volume));
             
@@ -109,10 +109,10 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                 }
             };
 
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket1, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
 
-            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket.Exchange]
-                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket1.ExchangeName]
+                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset).Balance;
             
             Assert.AreEqual(balance * 0.8m, orders.Sum(e => e.NormalizeLevel.Volume));
 

@@ -59,7 +59,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 if (exchangeMarketInfo != null)
                     availableExchanges.Add(new ExternalMarket()
                     {
-                        Exchange = exchange,
+                        ExchangeName = exchange,
                         MarketInfo = exchangeMarketInfo
                     });
             }

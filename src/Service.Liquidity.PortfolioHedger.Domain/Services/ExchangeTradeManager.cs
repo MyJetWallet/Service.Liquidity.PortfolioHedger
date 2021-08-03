@@ -79,9 +79,9 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return orders.GroupBy(e => e.Exchange).Select(e => new ExternalMarketTrade()
             {
                 ExchangeName = e.Key,
-                Market = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.Market).First(),
-                BaseAsset = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.BaseAsset).First(),
-                QuoteAsset = externalMarkets.Where(x => x.Exchange == e.Key).Select(y=> y.MarketInfo.QuoteAsset).First(),
+                Market = externalMarkets.Where(x => x.ExchangeName == e.Key).Select(y=> y.MarketInfo.Market).First(),
+                BaseAsset = externalMarkets.Where(x => x.ExchangeName == e.Key).Select(y=> y.MarketInfo.BaseAsset).First(),
+                QuoteAsset = externalMarkets.Where(x => x.ExchangeName == e.Key).Select(y=> y.MarketInfo.QuoteAsset).First(),
                 BaseVolume = e.Sum(q => (decimal) q.OriginalLevel.Volume)
             }).ToList();
         }

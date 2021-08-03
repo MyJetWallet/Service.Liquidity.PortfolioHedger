@@ -28,19 +28,59 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         {
             var externalMarkets = new List<ExternalMarket>()
             {
-                {StaticFieldsForTests.ExternalMarket} 
+                {StaticFieldsForTests.ExternalMarket1} 
             };
             var trades = await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
 
-            Assert.AreEqual(StaticFieldsForTests.ExternalMarket.Exchange, trades.Select(e => e.ExchangeName).First());
-            Assert.AreEqual(StaticFieldsForTests.ExternalMarket.MarketInfo.Market, trades.Select(e => e.Market).First());
-            Assert.AreEqual(StaticFieldsForTests.ExternalMarket.MarketInfo.BaseAsset, trades.Select(e => e.BaseAsset).First());
-            Assert.AreEqual(StaticFieldsForTests.ExternalMarket.MarketInfo.QuoteAsset, trades.Select(e => e.QuoteAsset).First());
-            Assert.AreEqual(StaticFieldsForTests.FromVolume, trades.Sum(e => e.BaseVolume));
+            Assert.AreEqual(1, trades.Count);
             
-            foreach (var trade in trades)
+            var trade = trades.First();
+            
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.ExchangeName, trade.ExchangeName);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.Market, trade.Market);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset, trade.BaseAsset);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.QuoteAsset, trade.QuoteAsset);
+            Assert.AreEqual(StaticFieldsForTests.FromVolume, trade.BaseVolume);
+            
+            foreach (var e in trades)
             {
-                Console.WriteLine(JsonConvert.SerializeObject(trade));
+                Console.WriteLine(JsonConvert.SerializeObject(e));
+            }
+        }
+        
+        [Test]
+        public async Task Test2()
+        {
+            var externalMarkets = new List<ExternalMarket>()
+            {
+                {StaticFieldsForTests.ExternalMarket1},
+                {StaticFieldsForTests.ExternalMarket2}
+            };
+            var trades = await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+
+            Assert.AreEqual(2, trades.Count);
+            
+            var trade1 = trades.First(e => e.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName);
+
+            var volumeFromFirstExchange = 0.1m;
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.ExchangeName, trade1.ExchangeName);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.Market, trade1.Market);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset, trade1.BaseAsset);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.QuoteAsset, trade1.QuoteAsset);
+            Assert.AreEqual(volumeFromFirstExchange, trade1.BaseVolume);
+            
+            var trade2 = trades.First(e => e.ExchangeName == StaticFieldsForTests.ExternalMarket2.ExchangeName);
+            
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket2.ExchangeName, trade2.ExchangeName);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket2.MarketInfo.Market, trade2.Market);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket2.MarketInfo.BaseAsset, trade2.BaseAsset);
+            Assert.AreEqual(StaticFieldsForTests.ExternalMarket2.MarketInfo.QuoteAsset, trade2.QuoteAsset);
+            Assert.AreEqual(StaticFieldsForTests.FromVolume - volumeFromFirstExchange, trade2.BaseVolume);
+            
+            
+            foreach (var e in trades)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(e));
             }
         }
     }
