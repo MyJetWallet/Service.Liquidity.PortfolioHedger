@@ -4,7 +4,7 @@ using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
-    public class ExchangeTradeWriter
+    public class ExchangeTradeWriter : IExchangeTradeWriter
     {
         private readonly IPublisher<TradeMessage> _publisher;
 

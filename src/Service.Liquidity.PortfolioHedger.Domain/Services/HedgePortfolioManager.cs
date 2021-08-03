@@ -12,12 +12,12 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
     public class HedgePortfolioManager : IHedgePortfolioManager
     {
         private readonly IExchangeTradeManager _exchangeTradeManager;
-        private readonly ExchangeTradeWriter _exchangeTradeWriter;
+        private readonly IExchangeTradeWriter _exchangeTradeWriter;
         private readonly IExternalExchangeManager _externalExchangeManager;
         private readonly IExternalMarket _externalMarket;
         
         public HedgePortfolioManager(IExchangeTradeManager exchangeTradeManager,
-            ExchangeTradeWriter exchangeTradeWriter,
+            IExchangeTradeWriter exchangeTradeWriter,
             IExternalExchangeManager externalExchangeManager,
             IExternalMarket externalMarket)
         {

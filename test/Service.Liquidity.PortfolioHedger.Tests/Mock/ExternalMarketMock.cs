@@ -32,14 +32,52 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
             throw new System.NotImplementedException();
         }
 
-        public Task<GetMarketInfoListResponse> GetMarketInfoListAsync(GetMarketInfoListRequest request)
+        public async Task<GetMarketInfoListResponse> GetMarketInfoListAsync(GetMarketInfoListRequest request)
         {
-            throw new System.NotImplementedException();
+            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName)
+            {
+                return new GetMarketInfoListResponse()
+                {
+                    Infos = new List<ExchangeMarketInfo>()
+                    {
+                        {StaticFieldsForTests.ExternalMarket1.MarketInfo}
+                    }
+                };
+            }
+
+            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket2.ExchangeName)
+            {
+                return new GetMarketInfoListResponse()
+                {
+                    Infos = new List<ExchangeMarketInfo>()
+                    {
+                        {StaticFieldsForTests.ExternalMarket2.MarketInfo}
+                    }
+                };
+            }
+            return null;
         }
 
-        public Task<ExchangeTrade> MarketTrade(MarketTradeRequest request)
+        public async Task<ExchangeTrade> MarketTrade(MarketTradeRequest request)
         {
-            throw new System.NotImplementedException();
+            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName)
+            {
+                return new ExchangeTrade()
+                {
+                    Volume = 0.1,
+                    OppositeVolume = 0.1 * (double) StaticFieldsForTests.ToVolume
+                };
+            }
+
+            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket2.ExchangeName)
+            {
+                return new ExchangeTrade()
+                {
+                    Volume = 0.15,
+                    OppositeVolume = 0.15 * (double) StaticFieldsForTests.ToVolume
+                };
+            }
+            return null;
         }
     }
 }

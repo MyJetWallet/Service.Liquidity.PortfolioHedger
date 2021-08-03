@@ -29,7 +29,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             
             builder
                 .RegisterType<ExchangeTradeWriter>()
-                .AsSelf()
+                .As<IExchangeTradeWriter>()
                 .SingleInstance();
             
             builder
