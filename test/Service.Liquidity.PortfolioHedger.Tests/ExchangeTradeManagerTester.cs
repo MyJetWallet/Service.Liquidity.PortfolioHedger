@@ -62,7 +62,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             
             var trade1 = trades.First(e => e.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName);
 
-            var volumeFromFirstExchange = 0.1m;
+            const decimal volumeFromFirstExchange = 0.1m;
+            
             Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.ExchangeName, trade1.ExchangeName);
             Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.Market, trade1.Market);
             Assert.AreEqual(StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset, trade1.BaseAsset);
