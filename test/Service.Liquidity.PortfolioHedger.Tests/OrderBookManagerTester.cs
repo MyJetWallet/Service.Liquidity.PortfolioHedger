@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -73,33 +72,12 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         [Test]
         public async Task Test1()
         {
-            var externalMarket = new ExternalMarket()
-            {
-                Exchange = "exchange1",
-                MarketInfo = new ExchangeMarketInfo()
-                {
-                    AssociateBaseAsset = "BTC",
-                    AssociateInstrument = "BTCUSD",
-                    AssociateQuoteAsset = "USD",
-                    BaseAsset = "BTC",
-                    QuoteAsset = "USD",
-                    Market = "BTCUSD",
-                    MinVolume = 0.01,
-                    PriceAccuracy = 2,
-                    VolumeAccuracy = 8
-                }
-            };
-            var fromAsset = "BTC";
-            var toAsset = "USD";
-            var fromVolume = 0.25m;
-            var toVolume = 40000m;
-
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
             
-            Assert.AreEqual(fromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
+            Assert.AreEqual(StaticFieldsForTests.FromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
             
-            var balance = _externalMarket.Balances[externalMarket.Exchange]
-                .First(e => e.Symbol == externalMarket.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket.Exchange]
+                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket.MarketInfo.BaseAsset).Balance;
 
             Assert.IsTrue((balance * 0.8m) > (decimal) orders.Sum(e => e.NormalizeLevel.Volume));
             
@@ -131,31 +109,10 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                 }
             };
 
-            var externalMarket = new ExternalMarket()
-            {
-                Exchange = "exchange1",
-                MarketInfo = new ExchangeMarketInfo()
-                {
-                    AssociateBaseAsset = "BTC",
-                    AssociateInstrument = "BTCUSD",
-                    AssociateQuoteAsset = "USD",
-                    BaseAsset = "BTC",
-                    QuoteAsset = "USD",
-                    Market = "BTCUSD",
-                    MinVolume = 0.01,
-                    PriceAccuracy = 2,
-                    VolumeAccuracy = 8
-                }
-            };
-            var fromAsset = "BTC";
-            var toAsset = "USD";
-            var fromVolume = 0.25m;
-            var toVolume = 40000m;
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
 
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
-
-            var balance = _externalMarket.Balances[externalMarket.Exchange]
-                .First(e => e.Symbol == externalMarket.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket.Exchange]
+                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket.MarketInfo.BaseAsset).Balance;
             
             Assert.AreEqual(balance * 0.8m, orders.Sum(e => e.NormalizeLevel.Volume));
 
