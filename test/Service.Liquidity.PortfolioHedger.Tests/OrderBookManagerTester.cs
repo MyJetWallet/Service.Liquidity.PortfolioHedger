@@ -16,8 +16,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
     public class OrderBookManagerTester
     {
         private IOrderBookManager _orderBookManager;
-        private IOrderBookSource _orderBookSource;
-        private IExternalMarket _externalMarket;
+        private OrderBookSourceMock _orderBookSource;
+        private ExternalMarketMock _externalMarket;
         
         [SetUp]
         public void Setup()
@@ -98,14 +98,67 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             
             Assert.AreEqual(fromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
             
-            var balances = await _externalMarket.GetBalancesAsync(new GetBalancesRequest()
-            {
-                ExchangeName = externalMarket.Exchange
-            });
-            var balanceByMarket = balances.Balances.FirstOrDefault(e => e.Symbol == fromAsset);
+            var balance = _externalMarket.Balances[externalMarket.Exchange]
+                .First(e => e.Symbol == externalMarket.MarketInfo.BaseAsset).Balance;
 
-            Assert.IsTrue((balanceByMarket.Balance * 0.8m) > (decimal) orders.Sum(e => e.NormalizeLevel.Volume));
+            Assert.IsTrue((balance * 0.8m) > (decimal) orders.Sum(e => e.NormalizeLevel.Volume));
             
+            foreach (var order in orders)
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(order));
+            }
+        }
+        
+        [Test]
+        public async Task Test2()
+        {
+            _externalMarket.Balances = new Dictionary<string, List<ExchangeBalance>>()
+            {
+                {
+                    "exchange1", new List<ExchangeBalance>()
+                    {
+                        new ExchangeBalance()
+                        {
+                            Symbol = "BTC",
+                            Balance = 0.1m
+                        },
+                        new ExchangeBalance()
+                        {
+                            Symbol = "USD",
+                            Balance = 1000000
+                        }
+                    }
+                }
+            };
+
+            var externalMarket = new ExternalMarket()
+            {
+                Exchange = "exchange1",
+                MarketInfo = new ExchangeMarketInfo()
+                {
+                    AssociateBaseAsset = "BTC",
+                    AssociateInstrument = "BTCUSD",
+                    AssociateQuoteAsset = "USD",
+                    BaseAsset = "BTC",
+                    QuoteAsset = "USD",
+                    Market = "BTCUSD",
+                    MinVolume = 0.01,
+                    PriceAccuracy = 2,
+                    VolumeAccuracy = 8
+                }
+            };
+            var fromAsset = "BTC";
+            var toAsset = "USD";
+            var fromVolume = 0.25m;
+            var toVolume = 40000m;
+
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(externalMarket, fromAsset, toAsset, fromVolume, toVolume);
+
+            var balance = _externalMarket.Balances[externalMarket.Exchange]
+                .First(e => e.Symbol == externalMarket.MarketInfo.BaseAsset).Balance;
+            
+            Assert.AreEqual(balance * 0.8m, orders.Sum(e => e.NormalizeLevel.Volume));
+
             foreach (var order in orders)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(order));
