@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Service.IndexPrices.Client;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Grpc;
+using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {
