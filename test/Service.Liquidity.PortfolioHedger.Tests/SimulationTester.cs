@@ -11,7 +11,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         {
         }
         
-        [Test]
+        //[Test]
         public async Task Test1()
         {
             SetBalance("Binance", "BTC", 5);

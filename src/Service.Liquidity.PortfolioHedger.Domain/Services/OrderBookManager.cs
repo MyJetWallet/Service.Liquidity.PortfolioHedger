@@ -143,7 +143,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 ExchangeName = exchange
             });
             var balanceByMarket = balances.Balances.FirstOrDefault(e => e.Symbol == asset);
-            var availableBalance = (balanceByMarket?.Free ?? 0) * 0.8m; // todo: GO TO NOSQL
+            var availableBalance = (balanceByMarket?.Balance ?? 0) * 0.8m; // todo: GO TO NOSQL
 
             return availableBalance;
         }
