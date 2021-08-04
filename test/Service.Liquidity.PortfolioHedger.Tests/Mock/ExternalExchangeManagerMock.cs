@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
-using MyJetWallet.Domain.ExternalMarketApi.Models;
+using MyJetWallet.Domain.ExternalMarketApi.Dto;
 
 namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 {

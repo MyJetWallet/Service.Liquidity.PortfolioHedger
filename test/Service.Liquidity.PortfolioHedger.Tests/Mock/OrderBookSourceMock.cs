@@ -9,13 +9,14 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
     public class OrderBookSourceMock : IOrderBookSource
     {
         public Dictionary<string, LeOrderBook> OrderBooks { get; set; }
-        
-        public Task<GetNameResult> GetNameAsync()
+
+
+        public Task<GetNameResult> GetNameAsync(GetOrderBookNameRequest request)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<GetSymbolResponse> GetSymbolsAsync()
+        public Task<GetSymbolResponse> GetSymbolsAsync(GetSymbolsRequest request)
         {
             throw new System.NotImplementedException();
         }

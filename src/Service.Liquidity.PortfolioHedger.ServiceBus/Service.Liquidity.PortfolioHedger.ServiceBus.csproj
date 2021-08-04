@@ -6,7 +6,7 @@
 
     <ItemGroup>
       <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
-      <PackageReference Include="MyJetWallet.Domain.ExternalMarketApi" Version="1.1.5" />
+      <PackageReference Include="MyJetWallet.Domain.ExternalMarketApi" Version="1.1.6" />
       <PackageReference Include="MyJetWallet.Domain.ServiceBus" Version="1.2.0" />
       <PackageReference Include="MyServiceBus.TcpClient" Version="2.4.4" />
     </ItemGroup>
