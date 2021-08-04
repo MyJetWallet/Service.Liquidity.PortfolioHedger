@@ -13,5 +13,7 @@ namespace Service.Liquidity.PortfolioHedger.Client
         public IManualTradeService GetExternalExchangeTradeService() => CreateGrpcService<IManualTradeService>();
 
         public IHedgePortfolioService GetHedgePortfolioService() => CreateGrpcService<IHedgePortfolioService>();
+        
+        public IExternalExchangeSettingsService GetExternalExchangeSettingsService() => CreateGrpcService<IExternalExchangeSettingsService>();
     }
 }

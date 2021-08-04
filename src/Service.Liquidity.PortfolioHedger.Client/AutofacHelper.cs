@@ -21,6 +21,12 @@ namespace Service.Liquidity.PortfolioHedger.Client
             builder.RegisterInstance(factory.GetHedgePortfolioService()).As<IHedgePortfolioService>().SingleInstance();
         }
         
+        public static void RegisterExternalExchangeSettingsServiceClient(this ContainerBuilder builder, string grpcServiceUrl)
+        {
+            var factory = new PortfolioHedgerClientFactory(grpcServiceUrl);
+            builder.RegisterInstance(factory.GetExternalExchangeSettingsService()).As<IExternalExchangeSettingsService>().SingleInstance();
+        }
+        
         public static void RegisterPortfolioHedgerServiceBusClient(this ContainerBuilder builder, MyServiceBusTcpClient client,
             string queueName,
             TopicQueueType queryType,
