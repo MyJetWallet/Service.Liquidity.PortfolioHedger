@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Service.IndexPrices.Client;
 using Service.Liquidity.PortfolioHedger.Domain;
@@ -9,37 +10,94 @@ namespace Service.Liquidity.PortfolioHedger.Services
     public class HedgePortfolioService : IHedgePortfolioService
     {
         private readonly IHedgePortfolioManager _hedgePortfolioManager;
-        private readonly IIndexPricesClient _indexPricesClient;
+        private HedgePortfolioHelper _hedgePortfolioHelper;
 
         public HedgePortfolioService(IHedgePortfolioManager hedgePortfolioManager,
-            IIndexPricesClient indexPricesClient)
+            HedgePortfolioHelper hedgePortfolioHelper)
         {
             _hedgePortfolioManager = hedgePortfolioManager;
-            _indexPricesClient = indexPricesClient;
+            _hedgePortfolioHelper = hedgePortfolioHelper;
         }
 
         public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
         {
-            var toVolume = GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
+            if (request.FromAsset == string.Empty || request.FromAssetVolume == 0)
+            {
+                return new ExecuteManualConvertResponse()
+                {
+                    Success = false,
+                    ErrorMessage = "Bad request: asset and volume cannot has empty values."
+                };
+            }
+            
+            var toVolume = _hedgePortfolioHelper.GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
 
+            if (toVolume == 0)
+            {
+                return new ExecuteManualConvertResponse()
+                {
+                    Success = false,
+                    ErrorMessage = "Cannot calculate opposite asset volume."
+                };
+            }
+            
             var brokerId = Program.Settings.DefaultBrokerId;
             var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(brokerId, request.FromAsset, request.ToAsset,
                 request.FromAssetVolume, toVolume);
 
             return new ExecuteManualConvertResponse()
             {
+                Success = true,
                 ExecutedFromValue = executedVolumes.ExecutedFromVolume,
                 ExecutedToValue = executedVolumes.ExecutedToVolume
             };
         }
 
-        private decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
+        public async Task<ExecuteAutoConvertResponse> ExecuteAutoConvert(ExecuteAutoConvertRequest request)
         {
-            var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
-            var toAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(toAsset);
+            if (request.FromAsset == string.Empty || request.FromAssetVolume == 0)
+            {
+                return new ExecuteAutoConvertResponse()
+                {
+                    Success = false,
+                    ErrorMessage = "Bad request: asset and volume cannot has empty values."
+                };
+            }
             
-            var toVolume = fromVolume * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
-            return toVolume;
+            var assetsToSkip = new List<string>() {request.FromAsset};
+            var toAsset = _hedgePortfolioHelper.GetOppositeAsset(assetsToSkip, request.FromAssetVolume);
+
+            if (string.IsNullOrWhiteSpace(toAsset))
+            {
+                return new ExecuteAutoConvertResponse()
+                {
+                    Success = false,
+                    ErrorMessage = "Cannot find opposite asset."
+                };
+            }
+            
+            var toVolume = _hedgePortfolioHelper.GetOppositeVolume(request.FromAsset, toAsset, request.FromAssetVolume);
+
+            if (toVolume == 0)
+            {
+                return new ExecuteAutoConvertResponse()
+                {
+                    Success = false,
+                    ErrorMessage = "Cannot calculate opposite asset volume."
+                };
+            }
+            
+            var brokerId = Program.Settings.DefaultBrokerId;
+            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(brokerId, request.FromAsset, toAsset,
+                request.FromAssetVolume, toVolume);
+
+            return new ExecuteAutoConvertResponse()
+            {
+                Success = true,
+                ExecutedFromValue = executedVolumes.ExecutedFromVolume,
+                ExecutedToValue = executedVolumes.ExecutedToVolume, 
+                ToAsset = toAsset
+            };
         }
     }
 }

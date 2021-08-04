@@ -15,7 +15,6 @@ using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
-using Service.Liquidity.PortfolioHedger.ServiceBus;
 
 namespace Service.Liquidity.PortfolioHedger.Services
 {

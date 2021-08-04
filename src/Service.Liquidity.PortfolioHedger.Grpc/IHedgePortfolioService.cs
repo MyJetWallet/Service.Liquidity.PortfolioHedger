@@ -9,5 +9,8 @@ namespace Service.Liquidity.PortfolioHedger.Grpc
     {
         [OperationContract]
         Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request);
+        
+        [OperationContract]
+        Task<ExecuteAutoConvertResponse> ExecuteAutoConvert(ExecuteAutoConvertRequest request);
     }
 }
