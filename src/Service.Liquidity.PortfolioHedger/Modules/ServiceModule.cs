@@ -22,6 +22,8 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
             builder.RegisterMyNoSqlReader<AssetPortfolioBalanceNoSql>(noSqlClient, AssetPortfolioBalanceNoSql.TableName);
             builder.RegisterMyNoSqlReader<AssetPortfolioStatusNoSql>(noSqlClient, AssetPortfolioStatusNoSql.TableName);
+            
+            builder.RegisterMyNoSqlWriter<ExternalExchangeSettingsNoSql>(Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), ExternalExchangeSettingsNoSql.TableName);
 
             builder
                 .RegisterType<AssetBalanceStateHandler>()
@@ -53,6 +55,14 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             builder
                 .RegisterType<OrderBookManager>()
                 .As<IOrderBookManager>()
+                .SingleInstance();
+            
+            
+            builder
+                .RegisterType<ExternalExchangeSettingsStorage>()
+                .As<IExternalExchangeSettingsStorage>()
+                .As<IStartable>()
+                .AutoActivate()
                 .SingleInstance();
         }
     }

@@ -28,5 +28,8 @@ namespace Service.Liquidity.PortfolioHedger.Settings
         
         [YamlProperty("LiquidityPortfolioHedger.DefaultBrokerId")]
         public string DefaultBrokerId { get; set; }
+
+        [YamlProperty("LiquidityPortfolioHedger.MyNoSqlWriterUrl")]
+        public string MyNoSqlWriterUrl { get; set; }
     }
 }
