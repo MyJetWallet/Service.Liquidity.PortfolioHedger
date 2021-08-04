@@ -5,6 +5,7 @@ using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Grpc
 {
+    [ServiceContract]
     public interface IExternalExchangeSettingsService
     {
         [OperationContract]
