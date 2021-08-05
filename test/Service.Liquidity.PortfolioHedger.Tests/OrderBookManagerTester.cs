@@ -23,23 +23,25 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         {
             _orderBookSource = new OrderBookSourceMock()
             {
-                OrderBooks = new Dictionary<string, LeOrderBook>()
+                OrderBooks = new Dictionary<string, List<LeOrderBook>>()
                 {
                     {
-                        "exchange1", new LeOrderBook()
-                        {
-                            Symbol = "BTCUSD",
-                            Asks = new List<LeOrderBookLevel>()
+                        "exchange1", new List<LeOrderBook>()
+                        { new LeOrderBook()
                             {
-                                new LeOrderBookLevel(41000, 0.1d),
-                                new LeOrderBookLevel(42000, 0.1d),
-                                new LeOrderBookLevel(43000, 0.1d)
-                            },
-                            Bids = new List<LeOrderBookLevel>()
-                            {
-                                new LeOrderBookLevel(39000, 0.1d),
-                                new LeOrderBookLevel(38000, 0.1d),
-                                new LeOrderBookLevel(37000, 0.1d)
+                                Symbol = "BTCUSD",
+                                Asks = new List<LeOrderBookLevel>()
+                                {
+                                    new LeOrderBookLevel(41000, 0.1d),
+                                    new LeOrderBookLevel(42000, 0.1d),
+                                    new LeOrderBookLevel(43000, 0.1d)
+                                },
+                                Bids = new List<LeOrderBookLevel>()
+                                {
+                                    new LeOrderBookLevel(39000, 0.1d),
+                                    new LeOrderBookLevel(38000, 0.1d),
+                                    new LeOrderBookLevel(37000, 0.1d)
+                                }
                             }
                         }
                     }

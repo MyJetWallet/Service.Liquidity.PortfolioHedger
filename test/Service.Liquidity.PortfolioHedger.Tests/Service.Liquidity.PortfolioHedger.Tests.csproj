@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MyJetWallet.Service.Liquidity.Portfolio.Client" Version="1.6.4" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
@@ -14,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Service.Liquidity.PortfolioHedger.Domain\Service.Liquidity.PortfolioHedger.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Service.Liquidity.PortfolioHedger\Service.Liquidity.PortfolioHedger.csproj" />
   </ItemGroup>
 
 </Project>

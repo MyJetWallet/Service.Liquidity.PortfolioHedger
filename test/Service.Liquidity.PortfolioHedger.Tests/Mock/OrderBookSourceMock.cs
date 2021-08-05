@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
@@ -8,7 +9,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 {
     public class OrderBookSourceMock : IOrderBookSource
     {
-        public Dictionary<string, LeOrderBook> OrderBooks { get; set; }
+        public Dictionary<string, List<LeOrderBook>> OrderBooks { get; set; }
 
 
         public Task<GetNameResult> GetNameAsync(GetOrderBookNameRequest request)
@@ -32,7 +33,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
             {
                 return new GetOrderBookResponse()
                 {
-                    OrderBook = value
+                    OrderBook = value.FirstOrDefault(e=> e.Symbol == request.Market)
                 };
             }
             return null;
