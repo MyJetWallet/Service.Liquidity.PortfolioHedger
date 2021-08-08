@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
@@ -8,7 +9,15 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 {
     public class ExternalMarketMock : IExternalMarket
     {
+        private readonly IndexPricesClientMock _indexPricesClientMock;
+
+        public ExternalMarketMock(IndexPricesClientMock indexPricesClientMock)
+        {
+            _indexPricesClientMock = indexPricesClientMock;
+        }
+
         public Dictionary<string, List<ExchangeBalance>> Balances { get; set; }
+        public Dictionary<string, List<ExchangeMarketInfo>> MarketInfos { get; set; }
         
         public Task<GetNameResult> GetNameAsync(GetNameRequest request)
         {
@@ -34,25 +43,32 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 
         public async Task<GetMarketInfoListResponse> GetMarketInfoListAsync(GetMarketInfoListRequest request)
         {
-            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName)
+            if (request.ExchangeName == TesterBase.ExternalMarket1.ExchangeName)
             {
                 return new GetMarketInfoListResponse()
                 {
                     Infos = new List<ExchangeMarketInfo>()
                     {
-                        {StaticFieldsForTests.ExternalMarket1.MarketInfo}
+                        {TesterBase.ExternalMarket1.MarketInfo}
                     }
                 };
             }
 
-            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket2.ExchangeName)
+            if (request.ExchangeName == TesterBase.ExternalMarket2.ExchangeName)
             {
                 return new GetMarketInfoListResponse()
                 {
                     Infos = new List<ExchangeMarketInfo>()
                     {
-                        {StaticFieldsForTests.ExternalMarket2.MarketInfo}
+                        {TesterBase.ExternalMarket2.MarketInfo}
                     }
+                };
+            }
+            if (MarketInfos.TryGetValue(request.ExchangeName, out var value))
+            {
+                return new GetMarketInfoListResponse()
+                {
+                    Infos = value
                 };
             }
             return null;
@@ -60,24 +76,24 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 
         public async Task<ExchangeTrade> MarketTrade(MarketTradeRequest request)
         {
-            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket1.ExchangeName)
+            var oppositeVolumeAbs = Math.Abs((double) GetOppositeVolume(request.Market.Substring(0, 3),
+                request.Market.Substring(3, 3), (decimal) request.Volume));
+            return new ExchangeTrade()
             {
-                return new ExchangeTrade()
-                {
-                    Volume = 0.1,
-                    OppositeVolume = 0.1 * (double) StaticFieldsForTests.ToVolume
-                };
-            }
-
-            if (request.ExchangeName == StaticFieldsForTests.ExternalMarket2.ExchangeName)
-            {
-                return new ExchangeTrade()
-                {
-                    Volume = 0.15,
-                    OppositeVolume = 0.15 * (double) StaticFieldsForTests.ToVolume
-                };
-            }
-            return null;
+                Volume = request.Volume,
+                OppositeVolume = request.Volume > 0 
+                    ? -oppositeVolumeAbs
+                    : request.Volume
+            };
+        }
+        
+        private decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
+        {
+            var fromAssetPrice = _indexPricesClientMock.GetIndexPriceByAssetAsync(fromAsset);
+            var toAssetPrice = _indexPricesClientMock.GetIndexPriceByAssetAsync(toAsset);
+            
+            var toVolume = fromVolume * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
+            return toVolume;
         }
     }
 }

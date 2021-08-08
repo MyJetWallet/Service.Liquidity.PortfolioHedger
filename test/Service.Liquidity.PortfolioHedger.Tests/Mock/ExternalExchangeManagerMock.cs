@@ -7,15 +7,13 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 {
     public class ExternalExchangeManagerMock : IExternalExchangeManager
     {
+        public List<string> ExchangeNames = new List<string>();
+        
         public async Task<GetExternalExchangeCollectionResponse> GetExternalExchangeCollectionAsync()
         {
             return new GetExternalExchangeCollectionResponse()
             {
-                ExchangeNames = new List<string>()
-                {
-                    {"exchange1"},
-                    {"exchange2"}
-                }
+                ExchangeNames = ExchangeNames
             };
         }
     }

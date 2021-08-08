@@ -32,7 +32,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             {
                 // тратим BASE ассет пока не потратим FROM
                 var balance = await GetAvailableBalance(externalMarket.ExchangeName, fromAsset);
-                var budget = Convert.ToDouble(Math.Min(balance, fromVolume));
+                var budget = Math.Abs(Convert.ToDouble(Math.Min(balance, fromVolume)));
                 var allLevels = orderbook.Bids.OrderByDescending(e => e.Price).ToList();
                 
                 for (var i = 0; i < allLevels.Count; i++)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -8,39 +9,42 @@ using Service.Liquidity.PortfolioHedger.Tests.Mock;
 
 namespace Service.Liquidity.PortfolioHedger.Tests
 {
-    public class HedgePortfolioManagerTester
+    public class HedgePortfolioManagerTester : TesterBase
     {
         private IHedgePortfolioManager _hedgePortfolioManager;
-        private ExchangeTradeManagerMock _exchangeTradeManager;
-        private ExchangeTradeWriterMock _exchangeTradeWriter;
-        private ExternalExchangeManagerMock _externalExchangeManager;
-        private ExternalMarketMock _externalMarket;
         
         [SetUp]
         public void Setup()
         {
-            _exchangeTradeManager = new ExchangeTradeManagerMock();
-            _exchangeTradeWriter = new ExchangeTradeWriterMock();
-            _externalExchangeManager = new ExternalExchangeManagerMock();
-            _externalMarket = new ExternalMarketMock();
+            IndexPricesClientMock = new IndexPricesClientMock();
+            ExchangeTradeManager = new ExchangeTradeManagerMock();
+            ExchangeTradeWriter = new ExchangeTradeWriterMock();
+            ExternalExchangeManager = new ExternalExchangeManagerMock();
+            ExternalMarket = new ExternalMarketMock(IndexPricesClientMock);
             
-            _hedgePortfolioManager = new HedgePortfolioManager(_exchangeTradeManager, _exchangeTradeWriter,
-                _externalExchangeManager, _externalMarket);
+            _hedgePortfolioManager = new HedgePortfolioManager(ExchangeTradeManager, ExchangeTradeWriter,
+                ExternalExchangeManager, ExternalMarket);
         }
         
         [Test]
         public async Task Test1()
         {
-            var response = await _hedgePortfolioManager.ExecuteHedgeConvert("testBroker", StaticFieldsForTests.FromAsset,
-                StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+            SetExchanges(new List<string>(){"exchange1", "exchange2"});
+            SetIndexPrice("BTC", 30000);
+            SetIndexPrice("USD", 1);
             
+            var trades = await _hedgePortfolioManager.GetTradesForExternalMarketAsync(TesterBase.FromAsset, 
+                TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
+
+            var executedVolumes = await _hedgePortfolioManager.ExecuteExternalMarketTrades(trades, TesterBase.FromAsset,
+                TesterBase.ToAsset, "testBroker");
+
+
+            Assert.AreEqual(TesterBase.FromAsset, executedVolumes.FromAsset);
+            Assert.AreEqual(TesterBase.ToAsset, executedVolumes.ToAsset);
+            Assert.AreEqual(TesterBase.FromVolume, executedVolumes.ExecutedFromVolume);
             
-            Assert.AreEqual(StaticFieldsForTests.FromAsset, response.FromAsset);
-            Assert.AreEqual(StaticFieldsForTests.ToAsset, response.ToAsset);
-            Assert.AreEqual(StaticFieldsForTests.FromVolume, response.ExecutedFromVolume);
-            Assert.AreEqual(StaticFieldsForTests.FromVolume * StaticFieldsForTests.ToVolume, response.ExecutedToVolume);
-            
-            Console.WriteLine(JsonConvert.SerializeObject(response));
+            Console.WriteLine(JsonConvert.SerializeObject(executedVolumes));
         }
     }
 }

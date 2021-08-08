@@ -26,19 +26,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
         }
-        
-        public async Task<ExecutedVolumes> ExecuteHedgeConvert(string brokerId, string fromAsset, string toAsset, decimal fromAssetVolume, decimal toAssetVolume)
-        {
-            var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
-            
-            var tradesForExternalMarkets = await GetTradesForExternalMarketAsync(externalMarkets,
-                fromAsset, toAsset, fromAssetVolume, toAssetVolume);
-            
-            var executedTrades = await ExecuteExternalMarketTrades(tradesForExternalMarkets, brokerId);
-            
-            return GetExecutedVolumesInRequestAssets(executedTrades, fromAsset, toAsset);
-        }
-
         private async Task<List<ExternalMarket>> GetAvailableExchangesAsync(string fromAsset, string toAsset)
         {
             var exchanges = (await _externalExchangeManager.GetExternalExchangeCollectionAsync()).ExchangeNames;
@@ -66,15 +53,14 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
             return availableExchanges;
         }
 
-        private async Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(List<ExternalMarket> externalMarkets, string fromAsset, string toAsset, decimal fromVolume,
-            decimal toVolume)
+        public async Task<List<ExternalMarketTrade>> GetTradesForExternalMarketAsync(string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
         {
+            var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
             return await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, fromAsset, toAsset, fromVolume, toVolume);
-
         }
 
-        private async Task<List<ExecutedTrade>> ExecuteExternalMarketTrades(
-            IEnumerable<ExternalMarketTrade> externalMarketTrades, string brokerId)
+        public async Task<ExecutedVolumes> ExecuteExternalMarketTrades(
+            IEnumerable<ExternalMarketTrade> externalMarketTrades, string fromAsset, string toAsset, string brokerId)
         {
             var marketTrades = new List<ExecutedTrade>();
             foreach (var trade in externalMarketTrades)
@@ -116,7 +102,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                     ExecutedQuoteVolume = (decimal) marketTrade.OppositeVolume
                 });
             }
-            return marketTrades;
+            return GetExecutedVolumesInRequestAssets(marketTrades, fromAsset, toAsset);
         }
         
         private ExecutedVolumes GetExecutedVolumesInRequestAssets(IReadOnlyCollection<ExecutedTrade> executedTrades, string fromAsset, string toAsset)

@@ -12,7 +12,7 @@ using Service.Liquidity.PortfolioHedger.Tests.Mock;
 
 namespace Service.Liquidity.PortfolioHedger.Tests
 {
-    public class OrderBookManagerTester
+    public class OrderBookManagerTester : TesterBase
     {
         private IOrderBookManager _orderBookManager;
         private OrderBookSourceMock _orderBookSource;
@@ -47,7 +47,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                     }
                 }
             };
-            _externalMarket = new ExternalMarketMock()
+            _externalMarket = new ExternalMarketMock(IndexPricesClientMock)
             {
                 Balances = new Dictionary<string, List<ExchangeBalance>>()
                 {
@@ -74,12 +74,12 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         [Test]
         public async Task Test1()
         {
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket1, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(TesterBase.ExternalMarket1, TesterBase.FromAsset, TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
             
-            Assert.AreEqual(StaticFieldsForTests.FromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
+            Assert.AreEqual(TesterBase.FromVolume, orders.Sum(e => e.NormalizeLevel.Volume));
             
-            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket1.ExchangeName]
-                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[TesterBase.ExternalMarket1.ExchangeName]
+                .First(e => e.Symbol == TesterBase.ExternalMarket1.MarketInfo.BaseAsset).Balance;
 
             Assert.IsTrue((balance * 0.8m) > (decimal) orders.Sum(e => e.NormalizeLevel.Volume));
             
@@ -111,10 +111,10 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                 }
             };
 
-            var orders = await _orderBookManager.GetAvailableOrdersAsync(StaticFieldsForTests.ExternalMarket1, StaticFieldsForTests.FromAsset, StaticFieldsForTests.ToAsset, StaticFieldsForTests.FromVolume, StaticFieldsForTests.ToVolume);
+            var orders = await _orderBookManager.GetAvailableOrdersAsync(TesterBase.ExternalMarket1, TesterBase.FromAsset, TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
 
-            var balance = _externalMarket.Balances[StaticFieldsForTests.ExternalMarket1.ExchangeName]
-                .First(e => e.Symbol == StaticFieldsForTests.ExternalMarket1.MarketInfo.BaseAsset).Balance;
+            var balance = _externalMarket.Balances[TesterBase.ExternalMarket1.ExchangeName]
+                .First(e => e.Symbol == TesterBase.ExternalMarket1.MarketInfo.BaseAsset).Balance;
             
             Assert.AreEqual(balance * 0.8m, orders.Sum(e => e.NormalizeLevel.Volume));
 

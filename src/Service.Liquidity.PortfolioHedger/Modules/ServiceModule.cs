@@ -40,7 +40,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
                 .AsSelf()
                 .SingleInstance();
             builder
-                .RegisterType<HedgePortfolioHelper>()
+                .RegisterType<PortfolioHandler>()
                 .AsSelf()
                 .SingleInstance();
             

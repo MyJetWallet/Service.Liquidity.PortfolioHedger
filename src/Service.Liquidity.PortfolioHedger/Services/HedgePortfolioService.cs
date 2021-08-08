@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Service.IndexPrices.Client;
 using Service.Liquidity.PortfolioHedger.Domain;
+using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
@@ -10,47 +11,13 @@ namespace Service.Liquidity.PortfolioHedger.Services
     public class HedgePortfolioService : IHedgePortfolioService
     {
         private readonly IHedgePortfolioManager _hedgePortfolioManager;
-        private HedgePortfolioHelper _hedgePortfolioHelper;
+        private readonly PortfolioHandler _portfolioHandler;
 
         public HedgePortfolioService(IHedgePortfolioManager hedgePortfolioManager,
-            HedgePortfolioHelper hedgePortfolioHelper)
+            PortfolioHandler portfolioHandler)
         {
             _hedgePortfolioManager = hedgePortfolioManager;
-            _hedgePortfolioHelper = hedgePortfolioHelper;
-        }
-
-        public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
-        {
-            if (request.FromAsset == string.Empty || request.FromAssetVolume == 0)
-            {
-                return new ExecuteManualConvertResponse()
-                {
-                    Success = false,
-                    ErrorMessage = "Bad request: asset and volume cannot has empty values."
-                };
-            }
-            
-            var toVolume = _hedgePortfolioHelper.GetOppositeVolume(request.FromAsset, request.ToAsset, request.FromAssetVolume);
-
-            if (toVolume == 0)
-            {
-                return new ExecuteManualConvertResponse()
-                {
-                    Success = false,
-                    ErrorMessage = "Cannot calculate opposite asset volume."
-                };
-            }
-            
-            var brokerId = Program.Settings.DefaultBrokerId;
-            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(brokerId, request.FromAsset, request.ToAsset,
-                request.FromAssetVolume, toVolume);
-
-            return new ExecuteManualConvertResponse()
-            {
-                Success = true,
-                ExecutedFromValue = executedVolumes.ExecutedFromVolume,
-                ExecutedToValue = executedVolumes.ExecutedToVolume
-            };
+            _portfolioHandler = portfolioHandler;
         }
 
         public async Task<ExecuteAutoConvertResponse> ExecuteAutoConvert(ExecuteAutoConvertRequest request)
@@ -63,40 +30,33 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     ErrorMessage = "Bad request: asset and volume cannot has empty values."
                 };
             }
-            
-            var assetsToSkip = new List<string>() {request.FromAsset};
-            var toAsset = _hedgePortfolioHelper.GetOppositeAsset(assetsToSkip, request.FromAssetVolume);
+            var availableOppositeAssets = _portfolioHandler.GetAvailableOppositeAssets(request.PortfolioSnapshot, request.FromAsset, request.FromAssetVolume);
 
-            if (string.IsNullOrWhiteSpace(toAsset))
+            foreach (var oppositeAsset in availableOppositeAssets.OrderBy(e=> e.Order))
             {
+                var trades = await _hedgePortfolioManager.GetTradesForExternalMarketAsync(request.FromAsset, 
+                    oppositeAsset.Asset, request.FromAssetVolume, oppositeAsset.Volume);
+
+                if (!trades.Any()) 
+                    continue;
+                
+                var executedVolumes = await _hedgePortfolioManager.ExecuteExternalMarketTrades(trades, request.FromAsset,
+                    oppositeAsset.Asset, "jetwallet");
+
+                _portfolioHandler.ChangePortfolioBalance(request.PortfolioSnapshot, executedVolumes);
+                
                 return new ExecuteAutoConvertResponse()
                 {
-                    Success = false,
-                    ErrorMessage = "Cannot find opposite asset."
+                    Success = true,
+                    ExecutedFromValue = executedVolumes.ExecutedFromVolume,
+                    ExecutedToValue = executedVolumes.ExecutedToVolume, 
+                    ToAsset = oppositeAsset.Asset
                 };
             }
-            
-            var toVolume = _hedgePortfolioHelper.GetOppositeVolume(request.FromAsset, toAsset, request.FromAssetVolume);
-
-            if (toVolume == 0)
-            {
-                return new ExecuteAutoConvertResponse()
-                {
-                    Success = false,
-                    ErrorMessage = "Cannot calculate opposite asset volume."
-                };
-            }
-            
-            var brokerId = Program.Settings.DefaultBrokerId;
-            var executedVolumes = await _hedgePortfolioManager.ExecuteHedgeConvert(brokerId, request.FromAsset, toAsset,
-                request.FromAssetVolume, toVolume);
-
             return new ExecuteAutoConvertResponse()
             {
-                Success = true,
-                ExecutedFromValue = executedVolumes.ExecutedFromVolume,
-                ExecutedToValue = executedVolumes.ExecutedToVolume, 
-                ToAsset = toAsset
+                Success = false,
+                ErrorMessage = "Cant find any available trades."
             };
         }
     }
