@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Grpc;
@@ -12,14 +15,17 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
         private readonly IHedgePortfolioCalculator _hedgePortfolioCalculator;
         private readonly PortfolioHandler _portfolioHandler;
         private readonly IExternalMarketTradesExecutor _externalMarketTradesExecutor;
+        private readonly ILogger<HedgePortfolioService> _logger;
 
         public HedgePortfolioService(IHedgePortfolioCalculator hedgePortfolioCalculator,
             PortfolioHandler portfolioHandler,
-            IExternalMarketTradesExecutor externalMarketTradesExecutor)
+            IExternalMarketTradesExecutor externalMarketTradesExecutor,
+            ILogger<HedgePortfolioService> logger)
         {
             _hedgePortfolioCalculator = hedgePortfolioCalculator;
             _portfolioHandler = portfolioHandler;
             _externalMarketTradesExecutor = externalMarketTradesExecutor;
+            _logger = logger;
         }
 
         public async Task ExecuteAutoConvert(ExecuteAutoConvertRequest request)
@@ -33,9 +39,9 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             {
                 var getTradesForHedgeRequest = await _hedgePortfolioCalculator.GetCalculationForHedge(actualPortfolio, analysisResult.FromAsset, analysisResult.FromAssetVolume);
 
-                if (getTradesForHedgeRequest.Trades == null)
+                if (getTradesForHedgeRequest.Trades == null || getTradesForHedgeRequest.Trades.Any())
                 {
-                    // todo: error log with portfolio json
+                    _logger.LogError("ExecuteAutoConvert tor found trades for portfolio{portfolioJson}", JsonConvert.SerializeObject(getTradesForHedgeRequest.PortfolioAfterTrades));
                     break;
                 }
 
