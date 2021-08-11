@@ -26,6 +26,9 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
         public async Task<List<ExternalMarketTrade>> GetTradesByExternalMarkets(string fromAsset, string toAsset, decimal fromVolume, decimal toVolume)
         {
+            
+            // TODO: добавить в LEVEL Market + направление сделки, дальше при сортировке и наборе агрегированного ордербука корректно сложить уровни
+            
             var externalMarkets = await GetAvailableExchangesAsync(fromAsset, toAsset);
             var orderBookLevels = new List<Level>();
             foreach (var externalMarket in externalMarkets)
@@ -89,7 +92,6 @@ namespace Service.Liquidity.PortfolioHedger.Services
         {
             return orders.GroupBy(e => e.Exchange).Select(e =>
             {
-
                 var baseVolume = 0m;
                 var quoteVolume = 0m;
                 
@@ -110,7 +112,6 @@ namespace Service.Liquidity.PortfolioHedger.Services
                         : (decimal) Math.Abs(e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count());
                 }
 
-                
                 return new ExternalMarketTrade()
                 {
                     ExchangeName = e.Key,

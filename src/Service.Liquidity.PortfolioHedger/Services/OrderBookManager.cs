@@ -22,29 +22,62 @@ namespace Service.Liquidity.PortfolioHedger.Services
             _externalMarket = externalMarket;
         }
         
-        public async Task<List<Level>> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset, decimal fromVolume,
-            decimal toVolume)
+        public async Task<List<Level>> GetAvailableOrdersAsync(ExternalMarket externalMarket, string fromAsset, string toAsset,
+            decimal fromVolume, decimal toVolume)
         {
             var orderbook = await GetOrderBookFromExchangeAsync(externalMarket);
             
             var availableLevels = new List<Level>();
             
-            if (externalMarket.MarketInfo.AssociateBaseAsset == fromAsset)
+            if (externalMarket.MarketInfo.AssociateBaseAsset == fromAsset && fromVolume < 0)
             {
-                // тратим BASE ассет пока не потратим FROM
                 var balance = await GetAvailableBalance(externalMarket.ExchangeName, fromAsset);
-                var budget = Math.Abs(Convert.ToDouble(Math.Min(balance, fromVolume)));
+
+                var budgetBase = Math.Min(balance, Math.Abs(fromVolume));
+
+                if (budgetBase <= 0)
+                {
+                    return availableLevels;
+                }
+                
+                var budgetQuote = toVolume;
+                
+                if (budgetQuote <= 0)
+                {
+                    return availableLevels;
+                }
+                
                 var allLevels = orderbook.Bids.OrderByDescending(e => e.Price).ToList();
                 
                 for (var i = 0; i < allLevels.Count; i++)
                 {
                     var level = allLevels[i];
+
+                    var levelVolume = (decimal) level.Volume;
+                    var levelPrice = (decimal) level.Price;
                     
-                    if (budget == 0)
+                    if (budgetBase == 0 || budgetQuote == 0)
                         break;
-                    if (level.Volume <= budget)
+
+                    if (levelVolume > budgetBase)
                     {
-                        budget -= level.Volume;
+                        levelVolume = budgetBase;
+                    }
+                    if (levelVolume * levelPrice > budgetQuote)
+                    {
+                        levelVolume = budgetQuote / levelPrice;
+                    }
+                    if (levelVolume < (decimal) externalMarket.MarketInfo.MinVolume)
+                    {
+                        levelVolume = 0;
+                    }
+                    if (levelVolume > 0)
+                    {
+                        budgetBase -= levelVolume;
+                        budgetQuote -= levelVolume * levelPrice;
+
+                        level.Volume = (double) levelVolume;
+                        
                         availableLevels.Add(new Level()
                         {
                             OriginalLevel = level,
@@ -52,74 +85,199 @@ namespace Service.Liquidity.PortfolioHedger.Services
                             NormalizeIsOriginal = true,
                             Exchange = externalMarket.ExchangeName
                         });
-                    } 
-                    else 
+                    }
+                    else
                     {
-                        level.Volume = budget;
-                        budget = 0;
-
-                        if (level.Volume >= externalMarket.MarketInfo.MinVolume)
-                        {
-                            availableLevels.Add(new Level()
-                            {
-                                OriginalLevel = level,
-                                NormalizeLevel = level,
-                                NormalizeIsOriginal = true,
-                                Exchange = externalMarket.ExchangeName
-                            });
-                        }
+                        break;
                     }
                 }
             }
-            else
+            if (externalMarket.MarketInfo.AssociateBaseAsset == fromAsset && fromVolume > 0)
             {
-                // покупаем BASE ассет пока не купим TO
-                
                 var balance = await GetAvailableBalance(externalMarket.ExchangeName, toAsset);
-                var budget = Convert.ToDouble(Math.Min(balance, toVolume));
+                
+                var budgetBase = fromVolume;
+
+                if (budgetBase <= 0)
+                {
+                    return availableLevels;
+                }
+                
+                var budgetQuote = Math.Min(balance, Math.Abs(toVolume));
+                
+                if (budgetQuote <= 0)
+                {
+                    return availableLevels;
+                }
+                
                 var allLevels = orderbook.Asks.OrderBy(e => e.Price).ToList();
                 
                 for (var i = 0; i < allLevels.Count; i++)
                 {
                     var level = allLevels[i];
+
+                    var levelVolume = (decimal) level.Volume;
+                    var levelPrice = (decimal) level.Price;
                     
-                    if (budget == 0)
+                    if (budgetBase == 0 || budgetQuote == 0)
                         break;
-                    
-                    if (Math.Abs(level.Volume) <= budget)
+
+                    if (levelVolume > budgetBase)
                     {
-                        budget += level.Volume;
+                        levelVolume = budgetBase;
+                    }
+                    if (levelVolume * levelPrice > budgetQuote)
+                    {
+                        levelVolume = budgetQuote / levelPrice;
+                    }
+                    if (levelVolume < (decimal) externalMarket.MarketInfo.MinVolume)
+                    {
+                        levelVolume = 0;
+                    }
+                    if (levelVolume > 0)
+                    {
+                        budgetBase -= levelVolume;
+                        budgetQuote -= levelVolume * levelPrice;
+
+                        level.Volume = (double) levelVolume;
+                        
                         availableLevels.Add(new Level()
                         {
                             OriginalLevel = level,
-                            NormalizeLevel = new LeOrderBookLevel()
-                            {
-                                Price = 1 / level.Price,
-                                Volume = -(level.Volume * level.Price)
-                            },
-                            NormalizeIsOriginal = false,
+                            NormalizeLevel = level,
+                            NormalizeIsOriginal = true,
                             Exchange = externalMarket.ExchangeName
                         });
-                    } 
-                    else 
+                    }
+                    else
                     {
-                        level.Volume = -budget;
-                        budget = 0;
+                        break;
+                    }
+                }
+            }
+            if (externalMarket.MarketInfo.AssociateBaseAsset == toAsset && toVolume < 0)
+            {
+                var balance = await GetAvailableBalance(externalMarket.ExchangeName, toAsset);
+                
+                var budgetBase = Math.Min(balance, Math.Abs(toVolume));
 
-                        if (Math.Abs(level.Volume) >= externalMarket.MarketInfo.MinVolume)
+                if (budgetBase <= 0)
+                {
+                    return availableLevels;
+                }
+                
+                var budgetQuote = fromVolume;
+                
+                if (budgetQuote <= 0)
+                {
+                    return availableLevels;
+                }
+                
+                var allLevels = orderbook.Bids.OrderByDescending(e => e.Price).ToList();
+                
+                for (var i = 0; i < allLevels.Count; i++)
+                {
+                    var level = allLevels[i];
+
+                    var levelVolume = (decimal) level.Volume;
+                    var levelPrice = (decimal) level.Price;
+                    
+                    if (budgetBase == 0 || budgetQuote == 0)
+                        break;
+
+                    if (levelVolume > budgetBase)
+                    {
+                        levelVolume = budgetBase;
+                    }
+                    if (levelVolume * levelPrice > budgetQuote)
+                    {
+                        levelVolume = budgetQuote / levelPrice;
+                    }
+                    if (levelVolume < (decimal) externalMarket.MarketInfo.MinVolume)
+                    {
+                        levelVolume = 0;
+                    }
+                    if (levelVolume > 0)
+                    {
+                        budgetBase -= levelVolume;
+                        budgetQuote -= levelVolume * levelPrice;
+
+                        level.Volume = (double) levelVolume;
+                        
+                        availableLevels.Add(new Level()
                         {
-                            availableLevels.Add(new Level()
-                            {
-                                OriginalLevel = level,
-                                NormalizeLevel = new LeOrderBookLevel()
-                                {
-                                    Price = 1 / level.Price,
-                                    Volume = -(level.Volume * level.Price)
-                                },
-                                NormalizeIsOriginal = false,
-                                Exchange = externalMarket.ExchangeName
-                            });
-                        }
+                            OriginalLevel = level,
+                            NormalizeLevel = level,
+                            NormalizeIsOriginal = true,
+                            Exchange = externalMarket.ExchangeName
+                        });
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            if (externalMarket.MarketInfo.AssociateBaseAsset == toAsset && toVolume > 0)
+            {
+                var balance = await GetAvailableBalance(externalMarket.ExchangeName, fromAsset);
+                
+                var budgetBase = toVolume;
+
+                if (budgetBase <= 0)
+                {
+                    return availableLevels;
+                }
+                
+                var budgetQuote = Math.Min(balance, Math.Abs(fromVolume));
+                
+                if (budgetQuote <= 0)
+                {
+                    return availableLevels;
+                }
+
+                var allLevels = orderbook.Asks.OrderBy(e => e.Price).ToList();
+                
+                for (var i = 0; i < allLevels.Count; i++)
+                {
+                    var level = allLevels[i];
+
+                    var levelVolume = (decimal) level.Volume;
+                    var levelPrice = (decimal) level.Price;
+                    
+                    if (budgetBase == 0 || budgetQuote == 0)
+                        break;
+
+                    if (levelVolume > budgetBase)
+                    {
+                        levelVolume = budgetBase;
+                    }
+                    if (levelVolume * levelPrice > budgetQuote)
+                    {
+                        levelVolume = budgetQuote / levelPrice;
+                    }
+                    if (levelVolume < (decimal) externalMarket.MarketInfo.MinVolume)
+                    {
+                        levelVolume = 0;
+                    }
+                    if (levelVolume > 0)
+                    {
+                        budgetBase -= levelVolume;
+                        budgetQuote -= levelVolume * levelPrice;
+
+                        level.Volume = (double) levelVolume;
+                        
+                        availableLevels.Add(new Level()
+                        {
+                            OriginalLevel = level,
+                            NormalizeLevel = level,
+                            NormalizeIsOriginal = true,
+                            Exchange = externalMarket.ExchangeName
+                        });
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }

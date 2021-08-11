@@ -29,7 +29,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             _logger = logger;
         }
 
-        public async Task<AssetPortfolio> ExecuteAutoConvert(ExecuteAutoConvertRequest request)
+        public async Task<GetTradesForHedgeRequest> ExecuteAutoConvert(ExecuteAutoConvertRequest request)
         {
             var actualPortfolio = request.PortfolioSnapshot;
             var analysisResult = _portfolioHandler.GetAnalysisResult(actualPortfolio);
@@ -52,7 +52,11 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             }
 
             var result = await _externalMarketTradesExecutor.ExecuteExternalMarketTrades(tradesForHedge, string.Empty,"jetwallet");
-            return actualPortfolio;
+            return new GetTradesForHedgeRequest()
+            {
+                PortfolioAfterTrades = actualPortfolio,
+                Trades = tradesForHedge
+            };
         }
 
         public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)

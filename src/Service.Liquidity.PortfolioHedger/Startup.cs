@@ -52,7 +52,7 @@ namespace Service.Liquidity.PortfolioHedger
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcSchema<ExternalExchangeSettingsService, IExternalExchangeSettingsService>();
-                endpoints.MapGrpcSchema<HedgePortfolioService, IHedgePortfolioService>();
+                //endpoints.MapGrpcSchema<HedgePortfolioService, IHedgePortfolioService>();
                 endpoints.MapGrpcSchema<ManualTradeService, IManualTradeService>();
                 endpoints.MapGrpcSchemaRegistry();
 

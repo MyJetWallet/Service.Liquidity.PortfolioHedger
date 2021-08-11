@@ -50,7 +50,6 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             };
             return new OrderBookManager(OrderBookSource, externalMarket);
         }
-        
         public static ExternalMarket ExternalMarket1 = new ExternalMarket()
         {
             ExchangeName = "exchange1",
@@ -83,10 +82,43 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                 VolumeAccuracy = 8
             }
         };
-        public static string FromAsset = "BTC";
-        public static string ToAsset = "USD";
-        public static decimal FromVolume = 0.25m;
-        public static decimal ToVolume = 40000m;
+
+        protected static ExternalMarket ExternalMarket3 = new ExternalMarket()
+        {
+            MarketInfo = new ExchangeMarketInfo()
+            {
+                AssociateBaseAsset = "ETH",
+                AssociateInstrument = "ETHUSD",
+                AssociateQuoteAsset = "USD",
+                BaseAsset = "ETH",
+                QuoteAsset = "USD",
+                Market = "ETHUSD",
+                MinVolume = 0.01,
+                PriceAccuracy = 2,
+                VolumeAccuracy = 8
+            }
+        };
+        
+        protected static ExternalMarket ExternalMarket4 = new ExternalMarket()
+        {
+            MarketInfo = new ExchangeMarketInfo()
+            {
+                AssociateBaseAsset = "XLM",
+                AssociateInstrument = "XLMUSD",
+                AssociateQuoteAsset = "USD",
+                BaseAsset = "XLM",
+                QuoteAsset = "USD",
+                Market = "XLMUSD",
+                MinVolume = 0.01,
+                PriceAccuracy = 2,
+                VolumeAccuracy = 8
+            }
+        };
+
+        protected static string FromAsset = "BTC";
+        protected static string ToAsset = "USD";
+        protected static decimal FromVolume = 0.25m;
+        protected static decimal ToVolume = 40000m;
         
         
         protected void SetBalance(string exchange, string asset, int volume)

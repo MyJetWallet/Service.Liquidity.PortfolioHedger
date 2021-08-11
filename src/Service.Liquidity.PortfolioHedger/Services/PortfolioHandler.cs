@@ -86,8 +86,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             
             return noSqlEntity.Balance;
         }
-
-        // todo: это значение или максимум из того что есть в портфолио (до нуля)
+        
         private decimal GetOppositeVolume(AssetPortfolio portfolioSnapshot, string fromAsset, string toAsset,
             decimal fromVolume)
         {
@@ -101,15 +100,12 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
             if (fromVolume > 0)
             {
-
                 var response = Math.Max(volumeInPortfolio, toVolumeAbs);
-
                 return Math.Abs(response);
             }
             else
             {
                 var response = Math.Min(volumeInPortfolioAbs, toVolumeAbs);
-
                 return response;
             }
         }
