@@ -118,7 +118,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             {
                 HedgeIsNeeded = mostProblemAsset != null,
                 FromAsset = mostProblemAsset?.Asset ?? string.Empty,
-                FromAssetVolume = mostProblemAsset?.NetVolume ?? 0
+                FromAssetVolume = -mostProblemAsset?.NetVolume ?? 0
             };
         }
     }
