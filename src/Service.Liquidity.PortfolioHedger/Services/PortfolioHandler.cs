@@ -23,20 +23,23 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
         public List<AvailableOppositeAsset> GetAvailableOppositeAssets(AssetPortfolio portfolioSnapshot, string fromAsset, decimal fromVolume)
         {
-            var response = new List<AvailableOppositeAsset>()
+            var response = new List<AvailableOppositeAsset>();
+
+            if (fromAsset != UsdAssetName)
             {
-                new AvailableOppositeAsset()
+                response.Add(new AvailableOppositeAsset()
                 {
                     Asset = UsdAssetName,
                     Order = 999,
                     Volume = int.MaxValue // todo: вынести в конфиг
-                }
-            };
+                });
+            }
+            
             if (portfolioSnapshot == null)
             {
                 return response;
             }
-            if (fromVolume > 0)
+            if (fromVolume < 0)
             {
                 var orderedPortfolio = portfolioSnapshot.BalanceByAsset
                     .Where(e => e.Asset != fromAsset && e.NetUsdVolume < 0)
@@ -50,7 +53,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     {
                         Order = index,
                         Asset = balanceByAsset.Asset,
-                        Volume = GetOppositeVolume(fromAsset, balanceByAsset.Asset, fromVolume)
+                        Volume = GetOppositeVolume(portfolioSnapshot, fromAsset, balanceByAsset.Asset, fromVolume)
                     });
                 }
             }
@@ -68,7 +71,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     {
                         Order = index,
                         Asset = balanceByAsset.Asset,
-                        Volume = GetOppositeVolume(fromAsset, balanceByAsset.Asset, fromVolume)
+                        Volume = GetOppositeVolume(portfolioSnapshot ,fromAsset, balanceByAsset.Asset, fromVolume)
                     });
                 }
             }
@@ -85,13 +88,30 @@ namespace Service.Liquidity.PortfolioHedger.Services
         }
 
         // todo: это значение или максимум из того что есть в портфолио (до нуля)
-        private decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
+        private decimal GetOppositeVolume(AssetPortfolio portfolioSnapshot, string fromAsset, string toAsset,
+            decimal fromVolume)
         {
             var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
             var toAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(toAsset);
+
+            var volumeInPortfolio = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == toAsset)?.NetVolume ?? 0;
+            var toVolumeAbs = Math.Abs(fromVolume) * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
             
-            var toVolume = fromVolume * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
-            return toVolume;
+            var volumeInPortfolioAbs = Math.Abs(volumeInPortfolio);
+
+            if (fromVolume > 0)
+            {
+
+                var response = Math.Max(volumeInPortfolio, toVolumeAbs);
+
+                return Math.Abs(response);
+            }
+            else
+            {
+                var response = Math.Min(volumeInPortfolioAbs, toVolumeAbs);
+
+                return response;
+            }
         }
 
         public decimal GetRemainder(AssetPortfolio portfolioSnapshot, AssetPortfolio newPortfolio, string fromAsset, decimal fromAssetVolume)

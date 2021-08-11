@@ -39,7 +39,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             {
                 var getTradesForHedgeRequest = await _hedgePortfolioCalculator.GetCalculationForHedge(actualPortfolio, analysisResult.FromAsset, analysisResult.FromAssetVolume);
 
-                if (getTradesForHedgeRequest.Trades == null || getTradesForHedgeRequest.Trades.Any())
+                if (getTradesForHedgeRequest.Trades == null || !getTradesForHedgeRequest.Trades.Any())
                 {
                     _logger.LogError("ExecuteAutoConvert tor found trades for portfolio{portfolioJson}", JsonConvert.SerializeObject(getTradesForHedgeRequest.PortfolioAfterTrades));
                     break;

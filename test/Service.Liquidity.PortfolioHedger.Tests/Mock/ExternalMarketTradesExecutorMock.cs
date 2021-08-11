@@ -7,9 +7,9 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
 {
     public class ExternalMarketTradesExecutorMock : IExternalMarketTradesExecutor
     {
-        public Task<ExecutedVolumes> ExecuteExternalMarketTrades(IEnumerable<ExternalMarketTrade> externalMarketTrades, string fromAsset, string brokerId)
+        public async Task<ExecutedVolumes> ExecuteExternalMarketTrades(IEnumerable<ExternalMarketTrade> externalMarketTrades, string fromAsset, string brokerId)
         {
-            throw new System.NotImplementedException();
+            return new ExecutedVolumes();
         }
     }
 }

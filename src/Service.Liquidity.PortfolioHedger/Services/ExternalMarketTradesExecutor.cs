@@ -21,6 +21,12 @@ namespace Service.Liquidity.PortfolioHedger.Services
         public async Task<ExecutedVolumes> ExecuteExternalMarketTrades(IEnumerable<ExternalMarketTrade> externalMarketTrades, string fromAsset, string brokerId)
         {
             var marketTrades = new List<ExecutedTrade>();
+
+            if (externalMarketTrades == null || !externalMarketTrades.Any())
+            {
+                return new ExecutedVolumes();
+            }
+            
             foreach (var trade in externalMarketTrades)
             {
                 var marketTradeRequest = new MarketTradeRequest
@@ -61,7 +67,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
                 });
             }
             var executedVolumes = fromAsset == string.Empty 
-                ? null
+                ? new ExecutedVolumes()
                 : new ExecutedVolumes
                 {
                     FromAsset = fromAsset,
