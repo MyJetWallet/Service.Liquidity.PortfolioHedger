@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,10 +89,27 @@ namespace Service.Liquidity.PortfolioHedger.Services
         {
             return orders.GroupBy(e => e.Exchange).Select(e =>
             {
-                var baseVolume = e.Sum(q => (decimal) q.OriginalLevel.Volume);
-                var quoteVolume = baseVolume > 0
-                    ? -(decimal) e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count()
-                    : (decimal) e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count();
+
+                var baseVolume = 0m;
+                var quoteVolume = 0m;
+                
+                if (e.First().NormalizeIsOriginal)
+                {
+                    baseVolume = e.Sum(q => (decimal) q.OriginalLevel.Volume);
+                    quoteVolume = baseVolume > 0
+                        ? -(decimal) Math.Abs(e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count())
+                        : (decimal) Math.Abs(e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count());
+                }
+                else
+                {
+                    baseVolume = e.First().NormalizeLevel.Volume > 0
+                        ? -Math.Abs(e.Sum(q => (decimal) q.OriginalLevel.Volume))
+                        : Math.Abs(e.Sum(q => (decimal) q.OriginalLevel.Volume));
+                    quoteVolume = baseVolume > 0
+                        ? -(decimal) Math.Abs(e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count())
+                        : (decimal) Math.Abs(e.Sum(x => x.OriginalLevel.Price * x.OriginalLevel.Volume) / e.Count());
+                }
+
                 
                 return new ExternalMarketTrade()
                 {
