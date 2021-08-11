@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Service.Liquidity.Portfolio.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Services;
@@ -56,6 +58,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var calculationForHedge = await HedgePortfolioCalculator.GetCalculationForHedge(portfolioSnapshot, FromAsset,  FromVolume);
     
             Console.WriteLine(JsonConvert.SerializeObject(calculationForHedge));
+            
+            Assert.AreEqual(-30000, calculationForHedge.Trades.FirstOrDefault().QuoteVolume);
         }
     }
 }

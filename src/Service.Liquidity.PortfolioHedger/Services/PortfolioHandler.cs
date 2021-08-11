@@ -119,7 +119,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             var fromAssetBalanceBefore = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
             var fromAssetBalanceAfter = newPortfolio.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
             
-            var targetBalance = fromAssetBalanceBefore?.NetUsdVolume ?? 0 + fromAssetVolume;
+            var targetBalance = (fromAssetBalanceBefore?.NetVolume ?? 0) + fromAssetVolume;
             
             var remainder = targetBalance - fromAssetBalanceAfter?.NetVolume;
 
