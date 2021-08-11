@@ -7,30 +7,28 @@ using NUnit.Framework;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
+using Service.Liquidity.PortfolioHedger.Services;
 using Service.Liquidity.PortfolioHedger.Tests.Mock;
 
 namespace Service.Liquidity.PortfolioHedger.Tests
 {
-    public class ExchangeTradeManagerTester
+    public class ExchangeTradeManagerTester : TesterBase
     {
-        private IExchangeTradeManager _exchangeTradeManager;
-        private OrderBookManagerMock _orderBookManagerMock;
-        
         [SetUp]
         public void Setup()
         {
-            _orderBookManagerMock = new OrderBookManagerMock();
-            _exchangeTradeManager = new ExchangeTradeManager(_orderBookManagerMock);
+            ExchangeTradeManager = new ExchangeTradeManager(OrderBookManager, ExternalExchangeManager, ExternalMarket);
         }
         
-        [Test]
+        //[Test]
         public async Task Test1()
         {
             var externalMarkets = new List<ExternalMarket>()
             {
                 {TesterBase.ExternalMarket1} 
             };
-            var trades = await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, TesterBase.FromAsset, TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
+            var trades = await ExchangeTradeManager.GetTradesByExternalMarkets(TesterBase.FromAsset, 
+                TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
 
             Assert.AreEqual(1, trades.Count);
             
@@ -48,7 +46,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             }
         }
         
-        [Test]
+        //[Test]
         public async Task Test2()
         {
             var externalMarkets = new List<ExternalMarket>()
@@ -56,7 +54,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                 {TesterBase.ExternalMarket1},
                 {TesterBase.ExternalMarket2}
             };
-            var trades = await _exchangeTradeManager.GetTradesByExternalMarkets(externalMarkets, TesterBase.FromAsset, TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
+            var trades = await ExchangeTradeManager.GetTradesByExternalMarkets(TesterBase.FromAsset, TesterBase.ToAsset, 
+                TesterBase.FromVolume, TesterBase.ToVolume);
 
             Assert.AreEqual(2, trades.Count);
             

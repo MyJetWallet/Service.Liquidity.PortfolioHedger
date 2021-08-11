@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
+using Service.Liquidity.PortfolioHedger.Services;
 using Service.Liquidity.PortfolioHedger.Tests.Mock;
 
 namespace Service.Liquidity.PortfolioHedger.Tests
@@ -71,7 +72,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             _orderBookManager = new OrderBookManager(_orderBookSource, _externalMarket);
         }
         
-        [Test]
+        //[Test]
         public async Task Test1()
         {
             var orders = await _orderBookManager.GetAvailableOrdersAsync(TesterBase.ExternalMarket1, TesterBase.FromAsset, TesterBase.ToAsset, TesterBase.FromVolume, TesterBase.ToVolume);
@@ -89,7 +90,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             }
         }
         
-        [Test]
+        //[Test]
         public async Task Test2()
         {
             _externalMarket.Balances = new Dictionary<string, List<ExchangeBalance>>()

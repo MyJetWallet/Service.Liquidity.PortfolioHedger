@@ -7,5 +7,6 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Models
         public string BaseAsset { get; set; }
         public string QuoteAsset { get; set; }
         public decimal BaseVolume { get; set; }
+        public decimal QuoteVolume { get; set; }
     }
 }

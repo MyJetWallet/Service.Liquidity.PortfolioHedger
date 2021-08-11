@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
+using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
-namespace Service.Liquidity.PortfolioHedger.Domain.Services
+namespace Service.Liquidity.PortfolioHedger.Services
 {
     public class OrderBookManager : IOrderBookManager
     {
@@ -143,7 +144,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
                 ExchangeName = exchange
             });
             var balanceByMarket = balances.Balances.FirstOrDefault(e => e.Symbol == asset);
-            var availableBalance = (balanceByMarket?.Balance ?? 0) * 0.8m; // todo: GO TO NOSQL
+            var availableBalance = (balanceByMarket?.Free ?? 0) * 0.8m; // todo: GO TO NOSQL
 
             return availableBalance;
         }

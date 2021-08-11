@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using MyNoSqlServer.Abstractions;
 using Service.IndexPrices.Client;
 using Service.Liquidity.Portfolio.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
@@ -10,14 +12,16 @@ namespace Service.Liquidity.PortfolioHedger.Services
     {
         private readonly IIndexPricesClient _indexPricesClient;
         private const string UsdAssetName = "USD";
+        private readonly IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> _assetPortfolioBalanceDataReader;
 
-        public PortfolioHandler(IIndexPricesClient indexPricesClient)
+        public PortfolioHandler(IIndexPricesClient indexPricesClient,
+            IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> assetPortfolioBalanceDataReader)
         {
             _indexPricesClient = indexPricesClient;
+            _assetPortfolioBalanceDataReader = assetPortfolioBalanceDataReader;
         }
 
-        public List<AvailableOppositeAsset> GetAvailableOppositeAssets(AssetPortfolio portfolioSnapshot, string fromAsset,
-            decimal fromVolume)
+        public List<AvailableOppositeAsset> GetAvailableOppositeAssets(AssetPortfolio portfolioSnapshot, string fromAsset, decimal fromVolume)
         {
             var response = new List<AvailableOppositeAsset>()
             {
@@ -25,14 +29,13 @@ namespace Service.Liquidity.PortfolioHedger.Services
                 {
                     Asset = UsdAssetName,
                     Order = 999,
-                    Volume = GetOppositeVolume(fromAsset, UsdAssetName, fromVolume)
+                    Volume = int.MaxValue // todo: вынести в конфиг
                 }
             };
             if (portfolioSnapshot == null)
             {
                 return response;
             }
-            
             if (fromVolume > 0)
             {
                 var orderedPortfolio = portfolioSnapshot.BalanceByAsset
@@ -72,6 +75,16 @@ namespace Service.Liquidity.PortfolioHedger.Services
             return response;
         }
 
+        public AssetPortfolio GetPortfolioSnapshot()
+        {
+            var noSqlEntity = _assetPortfolioBalanceDataReader.Get().FirstOrDefault();
+            if (noSqlEntity == null)
+                throw new Exception("Asset portfolio not found in NoSql");
+            
+            return noSqlEntity.Balance;
+        }
+
+        // todo: это значение или максимум из того что есть в портфолио (до нуля)
         private decimal GetOppositeVolume(string fromAsset, string toAsset, decimal fromVolume)
         {
             var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
@@ -81,19 +94,32 @@ namespace Service.Liquidity.PortfolioHedger.Services
             return toVolume;
         }
 
-        public void ChangePortfolioBalance(AssetPortfolio portfolioSnapshot, ExecutedVolumes executedVolumes)
+        public decimal GetRemainder(AssetPortfolio portfolioSnapshot, AssetPortfolio newPortfolio, string fromAsset, decimal fromAssetVolume)
         {
-            var fromAssetBalance =
-                portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == executedVolumes.FromAsset);
+            var fromAssetBalanceBefore = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
+            var fromAssetBalanceAfter = newPortfolio.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
             
-            if (fromAssetBalance != null)
-                fromAssetBalance.NetVolume += executedVolumes.ExecutedFromVolume;
+            var targetBalance = fromAssetBalanceBefore?.NetUsdVolume ?? 0 + fromAssetVolume;
+            
+            var remainder = targetBalance - fromAssetBalanceAfter?.NetVolume;
 
-            var toAssetBalance =
-                portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == executedVolumes.ToAsset);
-            
-            if (toAssetBalance != null)
-                toAssetBalance.NetVolume += executedVolumes.ExecutedToVolume;
+            return remainder ?? 0;
+        }
+        
+        public AnalysisResult GetAnalysisResult(AssetPortfolio requestPortfolioSnapshot)
+        {
+            var problemVolume = 10000;
+            var mostProblemAsset = requestPortfolioSnapshot.BalanceByAsset
+                .Where(e => Math.Abs(e.NetUsdVolume) > problemVolume)
+                .OrderByDescending(e => Math.Abs(e.NetUsdVolume))
+                .FirstOrDefault();
+
+            return new AnalysisResult()
+            {
+                HedgeIsNeeded = mostProblemAsset != null,
+                FromAsset = mostProblemAsset?.Asset ?? string.Empty,
+                FromAssetVolume = mostProblemAsset?.NetVolume ?? 0
+            };
         }
     }
 }

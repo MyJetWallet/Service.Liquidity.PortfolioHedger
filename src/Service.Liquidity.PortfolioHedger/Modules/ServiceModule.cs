@@ -45,8 +45,12 @@ namespace Service.Liquidity.PortfolioHedger.Modules
                 .SingleInstance();
             
             builder
-                .RegisterType<HedgePortfolioManager>()
-                .As<IHedgePortfolioManager>()
+                .RegisterType<HedgePortfolioCalculator>()
+                .As<IHedgePortfolioCalculator>()
+                .SingleInstance();
+            builder
+                .RegisterType<ExternalMarketTradesExecutor>()
+                .As<IExternalMarketTradesExecutor>()
                 .SingleInstance();
             builder
                 .RegisterType<ExchangeTradeManager>()

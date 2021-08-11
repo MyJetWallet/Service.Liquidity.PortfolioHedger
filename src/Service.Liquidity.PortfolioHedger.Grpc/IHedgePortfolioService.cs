@@ -8,6 +8,8 @@ namespace Service.Liquidity.PortfolioHedger.Grpc
     public interface IHedgePortfolioService
     {
         [OperationContract]
-        Task<ExecuteAutoConvertResponse> ExecuteAutoConvert(ExecuteAutoConvertRequest request);
+        Task ExecuteAutoConvert(ExecuteAutoConvertRequest request);
+
+        Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request);
     }
 }

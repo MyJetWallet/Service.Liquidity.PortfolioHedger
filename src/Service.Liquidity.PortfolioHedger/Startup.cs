@@ -13,6 +13,7 @@ using ProtoBuf.Grpc.Server;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Modules;
 using Service.Liquidity.PortfolioHedger.Services;
+using Service.Liquidity.PortfolioHedger.Services.Grpc;
 using SimpleTrading.BaseMetrics;
 using SimpleTrading.ServiceStatusReporterConnector;
 

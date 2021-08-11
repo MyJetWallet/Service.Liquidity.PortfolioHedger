@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Models;
 using Service.IndexPrices.Domain.Models;
 using Service.Liquidity.Portfolio.Domain.Models;
@@ -12,7 +13,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
 {
     public class TesterBase
     {
-        protected IHedgePortfolioManager HedgePortfolioManager;
+        protected IHedgePortfolioCalculator HedgePortfolioCalculator;
+        protected IExternalMarketTradesExecutor ExternalMarketTradesExecutor;
         protected ExchangeTradeWriterMock ExchangeTradeWriter;
         protected ExternalExchangeManagerMock ExternalExchangeManager;
         protected IExchangeTradeManager ExchangeTradeManager;
@@ -22,6 +24,32 @@ namespace Service.Liquidity.PortfolioHedger.Tests
         protected PortfolioStorageMock PortfolioStorage;
         protected PortfolioHandler PortfolioHandler;
         protected IndexPricesClientMock IndexPricesClientMock;
+        protected PortfolioStorageMock PortfolioStorageMock;
+        protected PortfolioReaderMock PortfolioReaderMock;
+
+
+        public TesterBase()
+        {
+            PortfolioStorage = new PortfolioStorageMock();
+            ExternalExchangeManager = new ExternalExchangeManagerMock();
+            IndexPricesClientMock = new IndexPricesClientMock();
+            PortfolioStorageMock = new PortfolioStorageMock();
+            PortfolioReaderMock = new PortfolioReaderMock(PortfolioStorageMock);
+            PortfolioHandler = new PortfolioHandler(IndexPricesClientMock, PortfolioReaderMock);
+            ExternalMarket = new ExternalMarketMock(IndexPricesClientMock) {Balances = new Dictionary<string, List<ExchangeBalance>>()};
+            OrderBookManager = GetOrderBookManager(ExternalMarket);
+            ExchangeTradeManager = new ExchangeTradeManager(OrderBookManager, ExternalExchangeManager, ExternalMarket);
+            HedgePortfolioCalculator = new HedgePortfolioCalculator(ExchangeTradeManager, PortfolioHandler, IndexPricesClientMock);
+            ExternalMarketTradesExecutor = new ExternalMarketTradesExecutorMock();
+        }
+        private IOrderBookManager GetOrderBookManager(IExternalMarket externalMarket)
+        {
+            OrderBookSource = new OrderBookSourceMock()
+            {
+                OrderBooks = new Dictionary<string, List<LeOrderBook>>()
+            };
+            return new OrderBookManager(OrderBookSource, externalMarket);
+        }
         
         public static ExternalMarket ExternalMarket1 = new ExternalMarket()
         {
@@ -77,7 +105,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                     balancesByExchange.Add(new ExchangeBalance()
                     {
                         Symbol = asset,
-                        Balance = volume
+                        Balance = volume,
+                        Free = volume
                     });
                 }
             }
@@ -88,7 +117,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
                     new ExchangeBalance()
                     {
                         Symbol = asset,
-                        Balance = volume
+                        Balance = volume,
+                        Free = volume
                     }
                 });
             }

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
-using MyJetWallet.Domain.ExternalMarketApi.Models;
 using MyJetWallet.Domain.Orders;
 using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
@@ -16,7 +15,7 @@ using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
-namespace Service.Liquidity.PortfolioHedger.Services
+namespace Service.Liquidity.PortfolioHedger.Services.Grpc
 {
     public class ManualTradeService : IManualTradeService
     {

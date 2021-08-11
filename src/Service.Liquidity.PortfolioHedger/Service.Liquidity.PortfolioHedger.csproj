@@ -19,7 +19,12 @@
     <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="1.2.0" />
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="1.5.5" />
     <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="1.0.3" />
+<<<<<<< Updated upstream
     <PackageReference Include="MyJetWallet.Service.AssetsDictionary.Client" Version="1.6.4" />
+=======
+    <PackageReference Include="MyJetWallet.Service.AssetsDictionary.Client" Version="1.6.3" />
+    <PackageReference Include="MyJetWallet.Service.IndexPrices.Client" Version="1.0.7" />
+>>>>>>> Stashed changes
     <PackageReference Include="MyJetWallet.Service.Liquidity.Monitoring.Client" Version="1.0.2" />
     <PackageReference Include="MyJetWallet.Service.Liquidity.Portfolio.Client" Version="1.6.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -40,6 +45,10 @@
     <None Update="Dockerfile">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Intefaces" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ namespace Service.Liquidity.PortfolioHedger.Job
         private readonly ILogger<AssetBalanceStateHandler> _logger;
         private readonly IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> _assetPortfolioBalanceDataReader;
         private readonly IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> _assetPortfolioStatusDataReader;
-        
+
         public AssetBalanceStateHandler(ILogger<AssetBalanceStateHandler> logger,
             IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> assetPortfolioBalanceDataReader,
             IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> assetPortfolioStatusDataReader)
