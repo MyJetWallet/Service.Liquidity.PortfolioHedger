@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Domain.ExternalMarketApi;
@@ -62,10 +63,16 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             SetPortfolio("USD", 30100);
             
             // Hedge +1 BTC ExecuteAutoConvert: FROM BTC, FROMVALUE -1
-            await _hedgePortfolioService.ExecuteAutoConvert(new ExecuteAutoConvertRequest()
+            var newPortfolio = await _hedgePortfolioService.ExecuteAutoConvert(new ExecuteAutoConvertRequest()
             {
                 PortfolioSnapshot = GetPortfolioSnapshot()
             });
+
+            var balance1 = newPortfolio.BalanceByAsset.First(e => e.Asset == "BTC");
+            var balance2 = newPortfolio.BalanceByAsset.First(e => e.Asset == "USD");
+
+            Assert.AreEqual(99.9999999999m, balance1.NetUsdVolume);
+            Assert.AreEqual(0, balance2.NetVolume);
         }
     }
 }

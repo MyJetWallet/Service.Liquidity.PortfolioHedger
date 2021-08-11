@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Service.Liquidity.Portfolio.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Grpc;
@@ -28,7 +29,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             _logger = logger;
         }
 
-        public async Task ExecuteAutoConvert(ExecuteAutoConvertRequest request)
+        public async Task<AssetPortfolio> ExecuteAutoConvert(ExecuteAutoConvertRequest request)
         {
             var actualPortfolio = request.PortfolioSnapshot;
             var analysisResult = _portfolioHandler.GetAnalysisResult(actualPortfolio);
@@ -51,6 +52,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             }
 
             var result = await _externalMarketTradesExecutor.ExecuteExternalMarketTrades(tradesForHedge, string.Empty,"jetwallet");
+            return actualPortfolio;
         }
 
         public async Task<ExecuteManualConvertResponse> ExecuteManualConvert(ExecuteManualConvertRequest request)
