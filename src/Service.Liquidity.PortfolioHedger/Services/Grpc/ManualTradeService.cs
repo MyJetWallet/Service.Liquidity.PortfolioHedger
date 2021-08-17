@@ -51,7 +51,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 
                 var marketTrade = await _externalMarket.MarketTrade(tradeForExchange);
                 _logger.LogInformation("Trade from externalMarket: {tradeJson}", JsonConvert.SerializeObject(marketTrade));
-
+                
                 var exchangeTradeMessage = new TradeMessage()
                 {
                     AssociateBrokerId = request.AssociateBrokerId,
@@ -62,15 +62,17 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                     AssociateWalletId = request.ExchangeName,
                     Id = marketTrade.Id,
                     Market = marketTrade.Market,
-                    Volume = marketTrade.Volume,
+                    Volume = (decimal) marketTrade.Volume,
                     Timestamp = marketTrade.Timestamp,
-                    OppositeVolume = marketTrade.OppositeVolume,
-                    Price = marketTrade.Price,
+                    OppositeVolume = (decimal) marketTrade.OppositeVolume,
+                    Price = (decimal) marketTrade.Price,
                     ReferenceId = marketTrade.ReferenceId,
                     Side = marketTrade.Side,
                     Source = marketTrade.Source,
                     Comment = request.Comment,
-                    User = request.User
+                    User = request.User,
+                    FeeAsset = request.QuoteAsset,
+                    FeeVolume = 0m
                 };
                 _hedgerMetrics.SetExecuteTradeMetrics(request);
                 await _exchangeTradeWriter.PublishTrade(exchangeTradeMessage);
@@ -104,6 +106,7 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 string.IsNullOrWhiteSpace(request.Symbol) ||
                 string.IsNullOrWhiteSpace(request.Comment) ||
                 string.IsNullOrWhiteSpace(request.User) ||
+                string.IsNullOrWhiteSpace(request.FeeAsset) ||
                 request.Price == 0 ||
                 request.BaseVolume == 0 ||
                 request.QuoteVolume == 0 ||
@@ -137,7 +140,9 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 BaseAsset = instrument?.BaseAsset,
                 QuoteAsset = instrument?.QuoteAsset,
                 Comment = request.Comment,
-                User = request.User
+                User = request.User,
+                FeeAsset = request.FeeAsset,
+                FeeVolume = request.FeeVolume
             };
             try
             {

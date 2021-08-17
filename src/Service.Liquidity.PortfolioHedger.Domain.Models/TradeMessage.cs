@@ -22,13 +22,13 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Models
         public OrderSide Side { get; set; }
 
         [DataMember(Order = 5)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         [DataMember(Order = 6)]
-        public double Volume { get; set; }
+        public decimal Volume { get; set; }
 
         [DataMember(Order = 7)]
-        public double OppositeVolume { get; set; }
+        public decimal OppositeVolume { get; set; }
 
         [DataMember(Order = 8)]
         public DateTime Timestamp { get; set; }
@@ -55,5 +55,11 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Models
         public string Comment { get; set; }
         [DataMember(Order = 17)]
         public string User { get; set; }
+        
+        [DataMember(Order = 18)] 
+        public string FeeAsset { get; set; }
+        
+        [DataMember(Order = 19)] 
+        public decimal FeeVolume { get; set; }
     }
 }

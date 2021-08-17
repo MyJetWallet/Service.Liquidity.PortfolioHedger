@@ -49,10 +49,10 @@ namespace Service.Liquidity.PortfolioHedger.Services
                     AssociateWalletId = trade.ExchangeName,
                     Id = marketTrade.Id,
                     Market = marketTrade.Market,
-                    Volume = marketTrade.Volume,
+                    Volume = (decimal) marketTrade.Volume,
                     Timestamp = marketTrade.Timestamp,
-                    OppositeVolume = marketTrade.OppositeVolume,
-                    Price = marketTrade.Price,
+                    OppositeVolume = (decimal) marketTrade.OppositeVolume,
+                    Price = (decimal) marketTrade.Price,
                     ReferenceId = marketTrade.ReferenceId,
                     Side = marketTrade.Side,
                     Source = marketTrade.Source
