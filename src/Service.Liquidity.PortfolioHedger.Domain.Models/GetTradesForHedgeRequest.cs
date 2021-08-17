@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Service.Liquidity.Portfolio.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Models
 {
+    [DataContract]
     public class GetTradesForHedgeRequest
     {
-        public List<ExternalMarketTrade> Trades { get; set; }
-        public AssetPortfolio PortfolioAfterTrades { get; set; }
+        [DataMember(Order = 1)] public List<ExternalMarketTrade> Trades { get; set; }
+        [DataMember(Order = 2)] public AssetPortfolio PortfolioAfterTrades { get; set; }
     }
 }
