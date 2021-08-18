@@ -4,7 +4,7 @@ using Service.Liquidity.PortfolioHedger.Domain.Services;
 using Service.Liquidity.PortfolioHedger.Grpc;
 using Service.Liquidity.PortfolioHedger.Grpc.Models;
 
-namespace Service.Liquidity.PortfolioHedger.Services
+namespace Service.Liquidity.PortfolioHedger.Services.Grpc
 {
     public class ExternalExchangeSettingsService : IExternalExchangeSettingsService
     {

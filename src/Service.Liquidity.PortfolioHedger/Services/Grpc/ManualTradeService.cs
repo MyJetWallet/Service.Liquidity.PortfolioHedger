@@ -1,14 +1,11 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MyJetWallet.Domain;
 using MyJetWallet.Domain.ExternalMarketApi;
 using MyJetWallet.Domain.ExternalMarketApi.Dto;
 using MyJetWallet.Domain.Orders;
 using MyJetWallet.Sdk.Service;
 using Newtonsoft.Json;
-using Service.AssetsDictionary.Client;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain.Services;
@@ -23,21 +20,18 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
         private readonly IExternalMarket _externalMarket;
         private readonly IExchangeTradeWriter _exchangeTradeWriter;
         private readonly ILogger<ManualTradeService> _logger;
-        private readonly ISpotInstrumentDictionaryClient _spotInstrumentDictionaryClient;
         private readonly HedgerMetrics _hedgerMetrics;
 
         public ManualTradeService(IExternalExchangeManager externalExchangeManager,
             IExternalMarket externalMarket,
             IExchangeTradeWriter exchangeTradeWriter,
             ILogger<ManualTradeService> logger,
-            ISpotInstrumentDictionaryClient spotInstrumentDictionaryClient,
             HedgerMetrics hedgerMetrics)
         {
             _externalExchangeManager = externalExchangeManager;
             _externalMarket = externalMarket;
             _exchangeTradeWriter = exchangeTradeWriter;
             _logger = logger;
-            _spotInstrumentDictionaryClient = spotInstrumentDictionaryClient;
             _hedgerMetrics = hedgerMetrics;
         }
 
@@ -103,7 +97,9 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
             
             if (string.IsNullOrWhiteSpace(request.BrokerId) ||
                 string.IsNullOrWhiteSpace(request.WalletName) ||
-                string.IsNullOrWhiteSpace(request.Symbol) ||
+                string.IsNullOrWhiteSpace(request.AssociateSymbol) ||
+                string.IsNullOrWhiteSpace(request.BaseAsset) ||
+                string.IsNullOrWhiteSpace(request.QuoteAsset) ||
                 string.IsNullOrWhiteSpace(request.Comment) ||
                 string.IsNullOrWhiteSpace(request.User) ||
                 string.IsNullOrWhiteSpace(request.FeeAsset) ||
@@ -116,17 +112,11 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 _logger.LogError($"Bad request entity: {JsonConvert.SerializeObject(request)}");
                 return new ManualTradeResponse() {Success = false, ErrorMessage = "Incorrect entity"};
             }
-            var instruments = _spotInstrumentDictionaryClient.GetSpotInstrumentByBroker(new JetBrandIdentity
-            {
-                BrokerId = request.BrokerId
-            });
-            var instrument = instruments.FirstOrDefault(e => e.Symbol == request.Symbol);
-
             var trade = new TradeMessage()
             {
                 Id = Guid.NewGuid().ToString("N"),
                 ReferenceId = string.Empty,
-                Market = request.Symbol,
+                Market = request.AssociateSymbol,
                 Side = request.BaseVolume < 0 ? OrderSide.Sell : OrderSide.Buy,
                 Price = request.Price,
                 Volume = request.BaseVolume,
@@ -135,10 +125,10 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 AssociateWalletId = request.WalletName,
                 AssociateBrokerId = request.BrokerId,
                 AssociateClientId = string.Empty,
-                AssociateSymbol = request.Symbol,
+                AssociateSymbol = request.AssociateSymbol,
                 Source = "manual",
-                BaseAsset = instrument?.BaseAsset,
-                QuoteAsset = instrument?.QuoteAsset,
+                BaseAsset = request.BaseAsset,
+                QuoteAsset = request.QuoteAsset,
                 Comment = request.Comment,
                 User = request.User,
                 FeeAsset = request.FeeAsset,

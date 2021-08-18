@@ -19,7 +19,7 @@ namespace Service.Liquidity.PortfolioHedger.Domain.Services
         public void SetReportTradeMetrics(ReportManualTradeRequest tradeRequest)
         {
             ManualTradeReportCounter
-                .WithLabels(tradeRequest.BrokerId, tradeRequest.WalletName, tradeRequest.Symbol)
+                .WithLabels(tradeRequest.BrokerId, tradeRequest.WalletName, tradeRequest.AssociateSymbol)
                 .Inc();
         }
         
