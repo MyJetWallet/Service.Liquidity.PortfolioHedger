@@ -119,8 +119,8 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
                 if (fromAssetBalance != null)
                 {
-                    fromAssetBalance.NetVolume += trade.BaseVolume;
-                    fromAssetBalance.NetUsdVolume = fromAssetBalance.NetVolume *
+                    fromAssetBalance.Volume += trade.BaseVolume;
+                    fromAssetBalance.UsdVolume = fromAssetBalance.Volume *
                                                     _indexPricesClient.GetIndexPriceByAssetAsync(fromAssetBalance.Asset)
                                                         .UsdPrice;
                 }
@@ -130,8 +130,8 @@ namespace Service.Liquidity.PortfolioHedger.Services
 
                 if (toAssetBalance != null)
                 {
-                    toAssetBalance.NetVolume += trade.QuoteVolume;
-                    toAssetBalance.NetUsdVolume = toAssetBalance.NetVolume *
+                    toAssetBalance.Volume += trade.QuoteVolume;
+                    toAssetBalance.UsdVolume = toAssetBalance.Volume *
                                                   _indexPricesClient.GetIndexPriceByAssetAsync(toAssetBalance.Asset)
                                                       .UsdPrice;
                 }

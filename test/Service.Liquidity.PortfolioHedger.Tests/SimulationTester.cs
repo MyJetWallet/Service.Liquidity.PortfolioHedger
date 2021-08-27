@@ -71,8 +71,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = newPortfolio.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = newPortfolio.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
 
-            Assert.AreEqual(99.9999999999m, balance1.NetUsdVolume);
-            Assert.AreEqual(0, balance2.NetVolume);
+            Assert.AreEqual(99.9999999999m, balance1.UsdVolume);
+            Assert.AreEqual(0, balance2.Volume);
         }
         
         //[Test]
@@ -113,8 +113,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = newPortfolio.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = newPortfolio.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
 
-            Assert.AreEqual(-99.9999999999m, balance1.NetUsdVolume);
-            Assert.AreEqual(0, balance2.NetVolume);
+            Assert.AreEqual(-99.9999999999m, balance1.UsdVolume);
+            Assert.AreEqual(0, balance2.Volume);
         }
     }
 }

@@ -42,8 +42,8 @@ namespace Service.Liquidity.PortfolioHedger.Services
             if (fromVolume < 0)
             {
                 var orderedPortfolio = portfolioSnapshot.BalanceByAsset
-                    .Where(e => e.Asset != fromAsset && e.NetUsdVolume < 0)
-                    .OrderBy(e => e.NetUsdVolume)
+                    .Where(e => e.Asset != fromAsset && e.UsdVolume < 0)
+                    .OrderBy(e => e.UsdVolume)
                     .ToList();
                 
                 for (var index = 0; index < orderedPortfolio.Count; index++)
@@ -60,8 +60,8 @@ namespace Service.Liquidity.PortfolioHedger.Services
             else
             {
                 var orderedPortfolio = portfolioSnapshot.BalanceByAsset
-                    .Where(e => e.Asset != fromAsset && e.NetUsdVolume > 0)
-                    .OrderBy(e => e.NetUsdVolume)
+                    .Where(e => e.Asset != fromAsset && e.UsdVolume > 0)
+                    .OrderBy(e => e.UsdVolume)
                     .ToList();
 
                 for (var index = 0; index < orderedPortfolio.Count; index++)
@@ -93,7 +93,7 @@ namespace Service.Liquidity.PortfolioHedger.Services
             var fromAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(fromAsset);
             var toAssetPrice = _indexPricesClient.GetIndexPriceByAssetAsync(toAsset);
 
-            var volumeInPortfolio = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == toAsset)?.NetVolume ?? 0;
+            var volumeInPortfolio = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == toAsset)?.Volume ?? 0;
             var toVolumeAbs = Math.Abs(fromVolume) * (fromAssetPrice.UsdPrice / toAssetPrice.UsdPrice);
             
             var volumeInPortfolioAbs = Math.Abs(volumeInPortfolio);
@@ -115,9 +115,9 @@ namespace Service.Liquidity.PortfolioHedger.Services
             var fromAssetBalanceBefore = portfolioSnapshot.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
             var fromAssetBalanceAfter = newPortfolio.BalanceByAsset.FirstOrDefault(e => e.Asset == fromAsset);
             
-            var targetBalance = (fromAssetBalanceBefore?.NetVolume ?? 0) + fromAssetVolume;
+            var targetBalance = (fromAssetBalanceBefore?.Volume ?? 0) + fromAssetVolume;
             
-            var remainder = targetBalance - fromAssetBalanceAfter?.NetVolume;
+            var remainder = targetBalance - fromAssetBalanceAfter?.Volume;
 
             return remainder ?? 0;
         }
@@ -126,15 +126,15 @@ namespace Service.Liquidity.PortfolioHedger.Services
         {
             var problemVolume = 10000;
             var mostProblemAsset = requestPortfolioSnapshot.BalanceByAsset
-                .Where(e => Math.Abs(e.NetUsdVolume) > problemVolume)
-                .OrderByDescending(e => Math.Abs(e.NetUsdVolume))
+                .Where(e => Math.Abs(e.UsdVolume) > problemVolume)
+                .OrderByDescending(e => Math.Abs(e.UsdVolume))
                 .FirstOrDefault();
 
             return new AnalysisResult()
             {
                 HedgeIsNeeded = mostProblemAsset != null,
                 FromAsset = mostProblemAsset?.Asset ?? string.Empty,
-                FromAssetVolume = -(mostProblemAsset?.NetVolume ?? 0)
+                FromAssetVolume = -(mostProblemAsset?.Volume ?? 0)
             };
         }
     }

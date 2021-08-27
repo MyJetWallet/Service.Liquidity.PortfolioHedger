@@ -223,16 +223,16 @@ namespace Service.Liquidity.PortfolioHedger.Tests
 
             if (balanceByAsset != null)
             {
-                balanceByAsset.NetVolume = volume;
-                balanceByAsset.NetUsdVolume = (IndexPricesClientMock.GetIndexPriceByAssetAsync(asset)?.UsdPrice ?? 0) * volume;
+                balanceByAsset.Volume = volume;
+                balanceByAsset.UsdVolume = (IndexPricesClientMock.GetIndexPriceByAssetAsync(asset)?.UsdPrice ?? 0) * volume;
             }
             else
             {
-                portfolio.BalanceByAsset.Add(new NetBalanceByAsset()
+                portfolio.BalanceByAsset.Add(new BalanceByAsset()
                 {
                     Asset = asset,
-                    NetVolume = volume,
-                    NetUsdVolume = (IndexPricesClientMock.GetIndexPriceByAssetAsync(asset)?.UsdPrice ?? 0) * volume
+                    Volume = volume,
+                    UsdVolume = (IndexPricesClientMock.GetIndexPriceByAssetAsync(asset)?.UsdPrice ?? 0) * volume
                 });
             }
         }
@@ -290,7 +290,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             
             var balanceByAsset = portfolio.BalanceByAsset.FirstOrDefault(e => e.Asset == asset);
 
-            return balanceByAsset?.NetVolume ?? 0;
+            return balanceByAsset?.Volume ?? 0;
         }
     }
 }

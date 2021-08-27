@@ -60,8 +60,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(100, balance2.Volume);
         }
         
         //[Test]
@@ -108,8 +108,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(-100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(-100, balance2.Volume);
         }
         
         //Test]
@@ -156,8 +156,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(-100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(-100, balance2.Volume);
         }
         
         //[Test]
@@ -204,8 +204,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(-100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(-100, balance2.Volume);
         }
         
         //[Test]
@@ -252,8 +252,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(100, balance2.Volume);
         }
         
         //[Test]
@@ -300,8 +300,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(100, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(100, balance2.Volume);
         }
         
         //[Test]
@@ -348,8 +348,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(-5000, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(-5000, balance2.Volume);
         }
         
         //[Test]
@@ -396,8 +396,8 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance1 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "BTC");
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(5000, balance2.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(5000, balance2.Volume);
         }
         
         //[Test]
@@ -453,9 +453,9 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             var balance3 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "ETH");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(0, balance2.NetVolume);
-            Assert.AreEqual(0, balance3.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(0, balance2.Volume);
+            Assert.AreEqual(0, balance3.Volume);
         }
         
         //Test]
@@ -511,9 +511,9 @@ namespace Service.Liquidity.PortfolioHedger.Tests
             var balance2 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "USD");
             var balance3 = calculationForHedge.PortfolioAfterTrades.BalanceByAsset.First(e => e.Asset == "ETH");
             
-            Assert.AreEqual(0, balance1.NetVolume);
-            Assert.AreEqual(-2500, balance2.NetVolume);
-            Assert.AreEqual(0, balance3.NetVolume);
+            Assert.AreEqual(0, balance1.Volume);
+            Assert.AreEqual(-2500, balance2.Volume);
+            Assert.AreEqual(0, balance3.Volume);
         }
         
         //[Test]

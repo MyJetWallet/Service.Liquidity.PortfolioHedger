@@ -7,7 +7,7 @@ namespace Service.Liquidity.PortfolioHedger.Tests.Mock
     {
         public AssetPortfolio Portfolio = new AssetPortfolio()
         {
-            BalanceByAsset = new List<NetBalanceByAsset>()
+            BalanceByAsset = new List<BalanceByAsset>()
         };
     }
 }
