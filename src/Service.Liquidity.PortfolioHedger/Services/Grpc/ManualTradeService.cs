@@ -102,7 +102,6 @@ namespace Service.Liquidity.PortfolioHedger.Services.Grpc
                 string.IsNullOrWhiteSpace(request.QuoteAsset) ||
                 string.IsNullOrWhiteSpace(request.Comment) ||
                 string.IsNullOrWhiteSpace(request.User) ||
-                string.IsNullOrWhiteSpace(request.FeeAsset) ||
                 request.Price == 0 ||
                 request.BaseVolume == 0 ||
                 request.QuoteVolume == 0 ||
