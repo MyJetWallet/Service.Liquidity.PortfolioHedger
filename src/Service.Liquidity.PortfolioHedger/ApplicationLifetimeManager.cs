@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
-using MyNoSqlServer.DataReader;
-using MyServiceBus.TcpClient;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.Liquidity.PortfolioHedger.Job;
 
 namespace Service.Liquidity.PortfolioHedger
@@ -11,20 +11,20 @@ namespace Service.Liquidity.PortfolioHedger
     public class ApplicationLifetimeManager : ApplicationLifetimeManagerBase
     {
         private readonly ILogger<ApplicationLifetimeManager> _logger;
-        private readonly MyServiceBusTcpClient _myServiceBusTcpClient;
-        private readonly MyNoSqlTcpClient[] _myNoSqlTcpClientManagers;
+        private readonly ServiceBusLifeTime _myServiceBusTcpClient;
+        private readonly MyNoSqlClientLifeTime _myNoSqlClientLifeTime;
         private readonly AssetBalanceStateHandler _assetBalanceStateHandler;
 
         public ApplicationLifetimeManager(IHostApplicationLifetime appLifetime,
             ILogger<ApplicationLifetimeManager> logger,
-            MyServiceBusTcpClient myServiceBusTcpClient,
-            MyNoSqlTcpClient[] myNoSqlTcpClientManagers,
+            ServiceBusLifeTime myServiceBusTcpClient,
+            MyNoSqlClientLifeTime myNoSqlClientLifeTime,
             AssetBalanceStateHandler assetBalanceStateHandler)
             : base(appLifetime)
         {
             _logger = logger;
             _myServiceBusTcpClient = myServiceBusTcpClient;
-            _myNoSqlTcpClientManagers = myNoSqlTcpClientManagers;
+            _myNoSqlClientLifeTime = myNoSqlClientLifeTime;
             _assetBalanceStateHandler = assetBalanceStateHandler;
         }
 
@@ -32,10 +32,7 @@ namespace Service.Liquidity.PortfolioHedger
         {
             _logger.LogInformation("OnStarted has been called.");
             _myServiceBusTcpClient.Start();
-            foreach(var client in _myNoSqlTcpClientManagers)
-            {
-                client.Start();
-            }
+            _myNoSqlClientLifeTime.Start();
             _assetBalanceStateHandler.Start();
         }
 
@@ -50,18 +47,7 @@ namespace Service.Liquidity.PortfolioHedger
             {
                 Console.WriteLine($"Exception on MyServiceBusTcpClient.Stop: {ex}");
             }
-            
-            foreach(var client in _myNoSqlTcpClientManagers)
-            {
-                try
-                {
-                    client.Stop();
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
-            }
+            _myNoSqlClientLifeTime.Stop();
         }
 
         protected override void OnStopped()

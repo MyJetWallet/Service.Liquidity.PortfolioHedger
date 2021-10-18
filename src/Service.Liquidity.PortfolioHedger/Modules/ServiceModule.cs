@@ -16,7 +16,7 @@ namespace Service.Liquidity.PortfolioHedger.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            var serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), ApplicationEnvironment.HostName, Program.LogFactory);
+            var serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.SpotServiceBusHostPort), Program.LogFactory);
             builder.RegisterMyServiceBusPublisher<TradeMessage>(serviceBusClient, TradeMessage.TopicName, true);
             
             var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));

@@ -1,14 +1,14 @@
 using System.Threading.Tasks;
-using DotNetCoreDecorators;
+using MyJetWallet.Sdk.ServiceBus;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Domain.Services
 {
     public class ExchangeTradeWriter : IExchangeTradeWriter
     {
-        private readonly IPublisher<TradeMessage> _publisher;
+        private readonly IServiceBusPublisher<TradeMessage> _publisher;
 
-        public ExchangeTradeWriter(IPublisher<TradeMessage> publisher)
+        public ExchangeTradeWriter(IServiceBusPublisher<TradeMessage> publisher)
         {
             _publisher = publisher;
         }
