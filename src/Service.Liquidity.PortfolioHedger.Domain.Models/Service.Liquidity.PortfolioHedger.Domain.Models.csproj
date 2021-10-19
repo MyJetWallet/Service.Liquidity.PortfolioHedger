@@ -10,7 +10,7 @@
     <PackageReference Include="MyJetWallet.Domain.ExternalMarketApi" Version="1.1.6" />
     <PackageReference Include="MyJetWallet.Sdk.NoSql" Version="1.4.0" />
     <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="1.2.2" />
-    <PackageReference Include="MyJetWallet.Service.Liquidity.Portfolio.Client" Version="1.6.9" />
+    <PackageReference Include="MyJetWallet.Service.Liquidity.Portfolio.Client" Version="1.6.10" />
   </ItemGroup>
 
 </Project>
