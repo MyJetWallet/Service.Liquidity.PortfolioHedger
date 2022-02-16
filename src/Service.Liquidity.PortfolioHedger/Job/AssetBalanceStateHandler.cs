@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using MyNoSqlServer.Abstractions;
-using Service.Liquidity.Monitoring.Domain.Models;
 using Service.Liquidity.Portfolio.Domain.Models;
 
 namespace Service.Liquidity.PortfolioHedger.Job
@@ -10,32 +9,18 @@ namespace Service.Liquidity.PortfolioHedger.Job
     {
         private readonly ILogger<AssetBalanceStateHandler> _logger;
         private readonly IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> _assetPortfolioBalanceDataReader;
-        private readonly IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> _assetPortfolioStatusDataReader;
 
         public AssetBalanceStateHandler(ILogger<AssetBalanceStateHandler> logger,
-            IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> assetPortfolioBalanceDataReader,
-            IMyNoSqlServerDataReader<AssetPortfolioStatusNoSql> assetPortfolioStatusDataReader)
+            IMyNoSqlServerDataReader<AssetPortfolioBalanceNoSql> assetPortfolioBalanceDataReader)
         {
             _logger = logger;
             _assetPortfolioBalanceDataReader = assetPortfolioBalanceDataReader;
-            _assetPortfolioStatusDataReader = assetPortfolioStatusDataReader;
         }
 
         public void Start()
         {
             _assetPortfolioBalanceDataReader.SubscribeToUpdateEvents(HandleUpdateBalance, HandleDeleteBalance);
-            _assetPortfolioStatusDataReader.SubscribeToUpdateEvents(HandleUpdateStatus, HandleDeleteStatus);
-
             var t = _assetPortfolioBalanceDataReader.Get();
-            var n = _assetPortfolioStatusDataReader.Get();
-        }
-
-        private void HandleDeleteStatus(IReadOnlyList<AssetPortfolioStatusNoSql> statuses)
-        {
-        }
-
-        private void HandleUpdateStatus(IReadOnlyList<AssetPortfolioStatusNoSql> statuses)
-        {
         }
 
         private void HandleDeleteBalance(IReadOnlyList<AssetPortfolioBalanceNoSql> balances)

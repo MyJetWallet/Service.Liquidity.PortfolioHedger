@@ -2,7 +2,6 @@
 using MyJetWallet.Sdk.NoSql;
 using MyJetWallet.Sdk.Service;
 using MyJetWallet.Sdk.ServiceBus;
-using Service.Liquidity.Monitoring.Domain.Models;
 using Service.Liquidity.Portfolio.Domain.Models;
 using Service.Liquidity.PortfolioHedger.Domain;
 using Service.Liquidity.PortfolioHedger.Domain.Models;
@@ -21,7 +20,6 @@ namespace Service.Liquidity.PortfolioHedger.Modules
             
             var noSqlClient = builder.CreateNoSqlClient(Program.ReloadedSettings(e => e.MyNoSqlReaderHostPort));
             builder.RegisterMyNoSqlReader<AssetPortfolioBalanceNoSql>(noSqlClient, AssetPortfolioBalanceNoSql.TableName);
-            builder.RegisterMyNoSqlReader<AssetPortfolioStatusNoSql>(noSqlClient, AssetPortfolioStatusNoSql.TableName);
             
             builder.RegisterMyNoSqlWriter<ExternalExchangeSettingsNoSql>(Program.ReloadedSettings(e => e.MyNoSqlWriterUrl), ExternalExchangeSettingsNoSql.TableName);
 
