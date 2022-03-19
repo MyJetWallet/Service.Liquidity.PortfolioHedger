@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetWallet.Domain.ExternalMarketApi" Version="1.2.0" />
+    <PackageReference Include="MyJetWallet.Domain.ExternalMarketApi" Version="1.2.1" />
     <PackageReference Include="MyJetWallet.Service.Liquidity.Portfolio.Client" Version="1.7.0" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
   </ItemGroup>
